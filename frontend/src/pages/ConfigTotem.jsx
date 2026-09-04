@@ -17,9 +17,9 @@ export default function ConfigTotem() {
     try {
       setLoading(true);
       const [resConf, resProd, resCat] = await Promise.all([
-        fetch('http://localhost:3001/api/config', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3001/api/productos', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3001/api/categorias', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/config`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/productos`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/categorias`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       
       if(resConf.ok) {
@@ -38,7 +38,7 @@ export default function ConfigTotem() {
 
   const handleSaveConfig = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/config/batch', {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/config/batch`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export default function ConfigTotem() {
   const toggleProducto = async (producto) => {
     try {
       const nuevoEstado = !producto.activo;
-      const res = await fetch(`http://localhost:3001/api/productos/${producto.id}`, {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/productos/${producto.id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ export default function ConfigTotem() {
   const toggleCategoria = async (categoria) => {
     try {
       const nuevoEstado = !categoria.activo;
-      const res = await fetch(`http://localhost:3001/api/categorias/${categoria.id}`, {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/categorias/${categoria.id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',

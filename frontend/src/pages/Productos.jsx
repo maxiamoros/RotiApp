@@ -136,7 +136,7 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
                 {(form.archivoImagen || form.imagenUrl) && (
                   <div className="mb-3 relative inline-block">
                     <img 
-                      src={form.archivoImagen ? URL.createObjectURL(form.archivoImagen) : (form.imagenUrl.startsWith('/uploads') ? `http://localhost:3001${form.imagenUrl}` : form.imagenUrl)} 
+                      src={form.archivoImagen ? URL.createObjectURL(form.archivoImagen) : (form.imagenUrl.startsWith('/uploads') ? `\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}${form.imagenUrl}` : form.imagenUrl)} 
                       alt="Preview" 
                       className="h-24 rounded-lg object-cover border border-[#4A5E68]"
                     />
@@ -310,7 +310,7 @@ const ProductoCard = ({ producto, onEditar, onEliminar }) => (
     {/* Contenido */}
     <div className="flex items-start gap-3 mb-3">
       {producto.imagenUrl ? (
-        <img src={producto.imagenUrl.startsWith('/uploads') ? `http://localhost:3001${producto.imagenUrl}` : producto.imagenUrl} alt={producto.nombre} className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-roti-dark border border-[#4A5E68]" />
+        <img src={producto.imagenUrl.startsWith('/uploads') ? `\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}${producto.imagenUrl}` : producto.imagenUrl} alt={producto.nombre} className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-roti-dark border border-[#4A5E68]" />
       ) : (
         <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#4A5E68] text-roti-cream/60 flex-shrink-0 text-xs text-center p-1">
           Sin imagen
@@ -359,9 +359,9 @@ const Productos = () => {
   const fetchTodo = async () => {
     try {
       const [resProd, resCat, resIns] = await Promise.all([
-        fetch('http://localhost:3001/api/productos', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3001/api/categorias', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3001/api/insumos', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/productos`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/categorias`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/insumos`, { headers: { 'Authorization': `Bearer ${token}` } }),
       ]);
       if(resProd.ok) setProductos(await resProd.json());
       if(resCat.ok) setCategorias(await resCat.json());
@@ -384,7 +384,7 @@ const Productos = () => {
         const formData = new FormData();
         formData.append('image', datos.archivoImagen);
         
-        const uploadRes = await fetch('http://localhost:3001/api/upload', {
+        const uploadRes = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/upload`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }, // Token si es necesario
           body: formData
@@ -401,7 +401,7 @@ const Productos = () => {
       delete dataAEnviar.archivoImagen;
 
       const isEdit = !!dataAEnviar.id;
-      const url = isEdit ? `http://localhost:3001/api/productos/${dataAEnviar.id}` : 'http://localhost:3001/api/productos';
+      const url = isEdit ? `\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/productos/${dataAEnviar.id}` : `\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/productos`;
       const method = isEdit ? 'PUT' : 'POST';
       const res = await fetch(url, {
         method,
@@ -421,7 +421,7 @@ const Productos = () => {
   const eliminarProducto = async (id) => {
     if(!window.confirm('¿Eliminar producto?')) return;
     try {
-      const res = await fetch(`http://localhost:3001/api/productos/${id}`, {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/productos/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

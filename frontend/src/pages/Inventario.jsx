@@ -269,7 +269,7 @@ const Inventario = () => {
 
   const fetchInsumos = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/insumos', {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/insumos`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setInsumos(await res.json());
@@ -285,7 +285,7 @@ const Inventario = () => {
   //  CRUD 
   const guardarInsumo = async (datos) => {
     try {
-      const url = datos.id ? `http://localhost:3001/api/insumos/${datos.id}` : 'http://localhost:3001/api/insumos';
+      const url = datos.id ? `\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/insumos/${datos.id}` : `\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/insumos`;
       const method = datos.id ? 'PUT' : 'POST';
       const res = await fetch(url, {
         method,
@@ -305,7 +305,7 @@ const Inventario = () => {
   const eliminarInsumo = async (id) => {
     if (!window.confirm('¿Eliminar insumo?')) return;
     try {
-      const res = await fetch(`http://localhost:3001/api/insumos/${id}`, {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/insumos/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -326,7 +326,7 @@ const Inventario = () => {
     if (tipo === 'ajuste')  nuevoStock = cantidad;
 
     try {
-      const res = await fetch(`http://localhost:3001/api/insumos/${insumo.id}`, {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/insumos/${insumo.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ ...insumo, stock: nuevoStock })

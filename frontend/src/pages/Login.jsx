@@ -32,7 +32,7 @@ const AdminLogin = () => {
       if (username === 'admin' && password === 'admin123') {
         try {
           // Intentar conectar con el backend real primero
-          const response = await fetch('http://localhost:3001/api/auth/login', {
+          const response = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password }),
@@ -55,7 +55,7 @@ const AdminLogin = () => {
       }
 
       // Flujo normal para otros usuarios o si el backend responde pero con error de credenciales
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

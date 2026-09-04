@@ -12,7 +12,7 @@ const Categorias = () => {
 
   const fetchCategorias = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/categorias', {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/categorias`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setCategorias(await res.json());
@@ -29,7 +29,7 @@ const Categorias = () => {
     e.preventDefault();
     setError(''); setMensaje('');
     try {
-      const url = editando ? `http://localhost:3001/api/categorias/${editando.id}` : 'http://localhost:3001/api/categorias';
+      const url = editando ? `\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/categorias/${editando.id}` : `\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/categorias`;
       const method = editando ? 'PUT' : 'POST';
       
       const res = await fetch(url, {
@@ -63,7 +63,7 @@ const Categorias = () => {
     if (!window.confirm('¿Seguro que deseas eliminar esta categoría?')) return;
     setError(''); setMensaje('');
     try {
-      const res = await fetch(`http://localhost:3001/api/categorias/${id}`, {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/categorias/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

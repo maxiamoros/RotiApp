@@ -156,9 +156,9 @@ export default function PortalCliente() {
 
       try {
         const [resConf, resProd, resCat] = await Promise.all([
-          fetch('http://localhost:3001/api/config',    { headers: { 'Authorization': `Bearer ${token}` }, signal: AbortSignal.timeout(4000) }),
-          fetch('http://localhost:3001/api/productos', { headers: { 'Authorization': `Bearer ${token}` }, signal: AbortSignal.timeout(4000) }),
-          fetch('http://localhost:3001/api/categorias',{ headers: { 'Authorization': `Bearer ${token}` }, signal: AbortSignal.timeout(4000) }),
+          fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/config`,    { headers: { 'Authorization': `Bearer ${token}` }, signal: AbortSignal.timeout(4000) }),
+          fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/productos`, { headers: { 'Authorization': `Bearer ${token}` }, signal: AbortSignal.timeout(4000) }),
+          fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/categorias`,{ headers: { 'Authorization': `Bearer ${token}` }, signal: AbortSignal.timeout(4000) }),
         ]);
 
         if (resConf.ok) {
@@ -280,7 +280,7 @@ export default function PortalCliente() {
     try {
       const nota = `Ticket #${ticketNum} - Pago: ${metodo}`;
       
-      const res = await fetch('http://localhost:3001/api/ventas', {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/ventas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ items: itemsDetalle, total: subtotal, metodo: metodo === 'Efectivo' ? 'efectivo' : 'mercadopago', estado: 'completado' })

@@ -171,9 +171,9 @@ const Caja = () => {
     const fetchCatalog = async () => {
       try {
         const [resProd, resCat, resVentas] = await Promise.all([
-          fetch('http://localhost:3001/api/productos', { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch('http://localhost:3001/api/categorias', { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch('http://localhost:3001/api/ventas', { headers: { 'Authorization': `Bearer ${token}` } })
+          fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/productos`, { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/categorias`, { headers: { 'Authorization': `Bearer ${token}` } }),
+          fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/ventas`, { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
         if(resProd.ok) setProductos(await resProd.json());
         if(resCat.ok) setCategorias(await resCat.json());
@@ -208,7 +208,7 @@ const Caja = () => {
 
     try {
       // 1. Guardar en backend (descuenta inventario)
-      const res = await fetch('http://localhost:3001/api/ventas', {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/ventas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ items: itemsDetalle, total, metodo, estado: 'completado' })
