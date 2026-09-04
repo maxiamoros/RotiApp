@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { agregarPedidoKDS } from '../data/pedidosKDS';
+import { PRODUCTOS_INICIALES } from '../data/productos';
 
 const formatPeso = (n) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
@@ -148,31 +149,57 @@ export default function PortalCliente() {
   const [metodoPago, setMetodoPago] = useState('');
   const [numPedido, setNumPedido] = useState(null);
 
-  // Data fetch
+  // Data fetch — con fallback a productos hardcodeados si el backend no está disponible
   useEffect(() => {
     const fetchData = async () => {
+      let productosOk = false;
+
       try {
         const [resConf, resProd, resCat] = await Promise.all([
-          fetch('http://localhost:3001/api/config', { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch('http://localhost:3001/api/productos', { headers: { 'Authorization': `Bearer ${token}` } }),
-          fetch('http://localhost:3001/api/categorias', { headers: { 'Authorization': `Bearer ${token}` } })
+          fetch('http://localhost:3001/api/config',    { headers: { 'Authorization': `Bearer ${token}` }, signal: AbortSignal.timeout(4000) }),
+          fetch('http://localhost:3001/api/productos', { headers: { 'Authorization': `Bearer ${token}` }, signal: AbortSignal.timeout(4000) }),
+          fetch('http://localhost:3001/api/categorias',{ headers: { 'Authorization': `Bearer ${token}` }, signal: AbortSignal.timeout(4000) }),
         ]);
-        if(resConf.ok) {
+
+        if (resConf.ok) {
           const conf = await resConf.json();
-          if(conf.welcomeMessage) setWelcomeMessage(conf.welcomeMessage);
+          if (conf.welcomeMessage) setWelcomeMessage(conf.welcomeMessage);
         }
-        if(resProd.ok) {
+
+        if (resProd.ok) {
           const prods = await resProd.json();
-          setProductos(prods.filter(p => p.activo !== false));
+          const activos = prods.filter(p => p.activo !== false);
+          if (activos.length > 0) {
+            setProductos(activos);
+            productosOk = true;
+          }
         }
-        if(resCat.ok) {
+
+        if (resCat.ok) {
           const cats = await resCat.json();
           setCategorias(cats.filter(c => c.activo !== false));
         }
-      } catch(err) { console.error(err); }
+      } catch (err) {
+        console.warn('[PortalCliente] API no disponible, usando catálogo local:', err.message);
+      }
+
+      // Fallback: si la API no devuelvió productos, carga los hardcodeados
+      if (!productosOk) {
+        // Normaliza el campo 'categoria' a 'categoriaNombre' para compatibilidad
+        const local = PRODUCTOS_INICIALES
+          .filter(p => p.activo !== false)
+          .map(p => ({ ...p, categoriaNombre: p.categoriaNombre || p.categoria }));
+        setProductos(local);
+
+        // Construir categorías desde los datos locales
+        const cats = [...new Set(local.map(p => p.categoriaNombre))]
+          .map((nombre, i) => ({ id: i + 1, nombre, activo: true }));
+        setCategorias(cats);
+      }
     };
+
     fetchData();
-  }, [token, isIdle]); // Reload config on idle
+  }, [token, isIdle]);
 
   // Activity Tracker
   const resetIdle = () => {
@@ -198,11 +225,20 @@ export default function PortalCliente() {
     return () => evts.forEach(e => window.removeEventListener(e, resetIdle));
   }, [isIdle]);
 
-  // Derived state
-  const categoriasMenu = ['Todas', ...categorias.map(c => c.nombre).filter(c => productos.some(p => p.categoriaNombre === c))];
-  
+  // Derived state — soporta tanto 'categoriaNombre' (API) como 'categoria' (local)
+  const getCategoria = (p) => p.categoriaNombre || p.categoria || '';
+
+  const categoriasMenu = [
+    'Todas',
+    ...categorias
+      .map(c => c.nombre)
+      .filter(nombre => productos.some(p => getCategoria(p) === nombre)),
+  ];
+
   const productosFiltrados = useMemo(() => {
-    return productos.filter(p => catActiva === 'Todas' || p.categoriaNombre === catActiva);
+    return productos.filter(p =>
+      catActiva === 'Todas' || getCategoria(p) === catActiva
+    );
   }, [productos, catActiva]);
 
   const subtotal = carrito.reduce((s, i) => s + i.precio * i.cantidad, 0);

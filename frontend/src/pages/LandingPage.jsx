@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import FloatingChatWidget from '../components/chat/FloatingChatWidget';
 
 // ─── DATA: Slides del Hero ─────────────────────────────────────────────────────
@@ -39,17 +39,17 @@ const heroSlides = [
 // ─── Navbar de Landing ─────────────────────────────────────────────────────────
 const LandingNavbar = ({ scrolled }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
+  // type: 'hash' → scroll suave en la misma página | 'route' → navega con React Router
   const publicLinks = [
-    { name: 'INICIO', href: '#inicio' },
-    { name: 'ESPECIALIDADES', href: '#especialidades' },
-    { name: 'SERVICIOS', href: '#servicios' },
-    { name: 'DELIVERY', href: '#delivery' },
-    { name: 'GALERÍA', href: '#galeria' },
-    { name: 'CONTACTO', href: '#contacto' },
+    { name: 'INICIO',          href: '#inicio',         type: 'hash'  },
+    { name: 'ESPECIALIDADES',  href: '#especialidades',  type: 'hash'  },
+    { name: 'SERVICIOS',       href: '#servicios',       type: 'hash'  },
+    { name: 'DELIVERY',        href: '/cliente',         type: 'route' },
+    { name: 'GALERÍA',         href: '#galeria',         type: 'hash'  },
+    { name: 'CONTACTO',        href: '#contacto',        type: 'hash'  },
   ];
-
-
 
   return (
     <header
@@ -72,17 +72,25 @@ const LandingNavbar = ({ scrolled }) => {
 
           {/* ── Nav Links Desktop ── */}
           <nav className="hidden xl:flex items-center gap-1">
-            {/* Links públicos */}
-            {publicLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="nav-link px-3 py-2 text-xs font-semibold tracking-widest text-white/80 hover:text-[#ff8c00] transition-colors duration-200"
-              >
-                {link.name}
-              </a>
-            ))}
-
+            {publicLinks.map((link) =>
+              link.type === 'route' ? (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="nav-link px-3 py-2 text-xs font-semibold tracking-widest text-white/80 hover:text-[#ff8c00] transition-colors duration-200"
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className="nav-link px-3 py-2 text-xs font-semibold tracking-widest text-white/80 hover:text-[#ff8c00] transition-colors duration-200"
+                >
+                  {link.name}
+                </a>
+              )
+            )}
           </nav>
 
           {/* ── CTA Button + Mobile Menu ── */}
@@ -114,16 +122,27 @@ const LandingNavbar = ({ scrolled }) => {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className="xl:hidden pb-6 border-t border-white/10 mt-2 pt-4 flex flex-col gap-1 animate-fade-in-up">
-            {publicLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className="px-4 py-3 text-sm font-semibold tracking-widest text-white/80 hover:text-[#ff8c00] hover:bg-white/5 rounded-lg transition-colors"
-              >
-                {link.name}
-              </a>
-            ))}
+            {publicLinks.map((link) =>
+              link.type === 'route' ? (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="px-4 py-3 text-sm font-semibold tracking-widest text-white/80 hover:text-[#ff8c00] hover:bg-white/5 rounded-lg transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="px-4 py-3 text-sm font-semibold tracking-widest text-white/80 hover:text-[#ff8c00] hover:bg-white/5 rounded-lg transition-colors"
+                >
+                  {link.name}
+                </a>
+              )
+            )}
 
             <Link
               to="/cliente"
@@ -398,6 +417,71 @@ const EspecialidadesSection = () => {
   );
 };
 
+// ─── Sección Galería ───────────────────────────────────────────────────────────
+const GaleriaSection = () => {
+  const fotos = [
+    { src: '/milanesa_hero.jpg', label: 'Milanesa Napolitana', sub: 'Con papas y aceitunas' },
+    { src: '/pizza_hero.jpg',    label: 'Pizza Muzzarella',    sub: 'Masa artesanal, extra queso' },
+    { src: '/pollo_hero.jpg',    label: 'Pollo al Espiedo',    sub: 'Dorado y jugoso' },
+    { src: '/milanesa_hero.jpg', label: 'Empanadas',           sub: 'Docena recién horneada' },
+  ];
+
+  return (
+    <section id="galeria" className="py-24 bg-[#0a0a0a] relative overflow-hidden">
+      {/* Faint horizontal rule top */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#d4a843]/30 to-transparent" />
+
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
+        {/* Header */}
+        <div className="text-center mb-14">
+          <p className="font-script text-3xl text-[#d4a843] mb-2">Nuestros Platos</p>
+          <h2 className="font-serif-display text-4xl md:text-5xl font-black text-white mb-4">
+            Galería de Sabores
+          </h2>
+          <div className="w-20 h-1 bg-gradient-to-r from-transparent via-[#ff8c00] to-transparent mx-auto" />
+        </div>
+
+        {/* Grid de fotos */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {fotos.map((foto, i) => (
+            <div
+              key={i}
+              className="group relative rounded-2xl overflow-hidden cursor-pointer aspect-square"
+            >
+              <img
+                src={foto.src}
+                alt={foto.label}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              {/* Overlay on hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300" />
+              <div className="absolute inset-x-0 bottom-0 p-4 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                <p className="font-serif-display text-white font-bold text-lg leading-tight">{foto.label}</p>
+                <p className="text-[#d4a843] text-xs mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">{foto.sub}</p>
+              </div>
+              {/* Gold corner accent */}
+              <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 border-[#d4a843]/0 group-hover:border-[#d4a843]/80 transition-colors duration-300 rounded-tr" />
+            </div>
+          ))}
+        </div>
+
+        {/* CTA ver menú completo */}
+        <div className="text-center mt-12">
+          <Link
+            to="/cliente"
+            className="inline-flex items-center gap-3 px-8 py-4 rounded-full border-2 border-[#ff8c00]/40 text-[#ff8c00] font-bold tracking-wide hover:bg-[#ff8c00]/10 hover:border-[#ff8c00] transition-all duration-300"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+            </svg>
+            Ver menú completo
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // ─── Sección Servicios ─────────────────────────────────────────────────────────
 const ServiciosSection = () => (
   <section id="servicios" className="py-24 bg-gradient-to-b from-[#0d0d0d] to-[#111111]">
@@ -546,6 +630,9 @@ export default function LandingPage() {
 
       {/* Especialidades */}
       <EspecialidadesSection />
+
+      {/* Galería */}
+      <GaleriaSection />
 
       {/* Servicios */}
       <ServiciosSection />

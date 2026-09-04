@@ -18,6 +18,7 @@ model Categoria {
   id        Int        @id @default(autoincrement())
   nombre    String     @unique
   emoji     String?
+  activo    Boolean    @default(true)
   productos Producto[]
 }
 
@@ -26,6 +27,7 @@ model Producto {
   nombre      String
   precio      Float
   imagenUrl   String?
+  activo      Boolean      @default(true)
   categoriaId Int?
   categoria   Categoria?   @relation(fields: [categoriaId], references: [id])
   receta      RecetaItem[]
@@ -54,4 +56,10 @@ model Pedido {
   estado String
   fecha  DateTime @default(now())
   items  String
+}
+
+model Configuracion {
+  id    Int    @id @default(autoincrement())
+  clave String @unique
+  valor String
 }

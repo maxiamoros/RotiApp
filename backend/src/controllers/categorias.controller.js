@@ -18,11 +18,11 @@ const getCategorias = async (req, res) => {
 
 const createCategoria = async (req, res) => {
   try {
-    const { nombre, emoji } = req.body;
+    const { nombre, emoji, activo } = req.body;
     if (!nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
 
     const nueva = await prisma.categoria.create({
-      data: { nombre, emoji }
+      data: { nombre, emoji, activo: activo !== undefined ? activo : true }
     });
     res.status(201).json(nueva);
   } catch (error) {
@@ -34,10 +34,10 @@ const createCategoria = async (req, res) => {
 const updateCategoria = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, emoji } = req.body;
+    const { nombre, emoji, activo } = req.body;
     const actualizada = await prisma.categoria.update({
       where: { id: parseInt(id) },
-      data: { nombre, emoji }
+      data: { nombre, emoji, activo: activo !== undefined ? activo : undefined }
     });
     res.json(actualizada);
   } catch (error) {
