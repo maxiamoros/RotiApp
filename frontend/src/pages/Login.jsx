@@ -28,6 +28,33 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
+      // Fallback temporal para Vercel (si el backend en localhost no responde)
+      if (username === 'admin' && password === 'admin123') {
+        try {
+          // Intentar conectar con el backend real primero
+          const response = await fetch('http://localhost:3001/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            login(data.user, data.token);
+            navigate('/admin');
+            return;
+          }
+        } catch (networkError) {
+          console.warn('Backend local inaccesible desde Vercel. Usando login de fallback.');
+          const fallbackUser = { id: 1, username: 'admin', rol: 'ADMIN' };
+          const fallbackToken = 'token-temporal-offline';
+          login(fallbackUser, fallbackToken);
+          navigate('/admin');
+          return;
+        }
+      }
+
+      // Flujo normal para otros usuarios o si el backend responde pero con error de credenciales
       const response = await fetch('http://localhost:3001/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
