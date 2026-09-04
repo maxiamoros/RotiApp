@@ -14,7 +14,7 @@ const FloatingChatWidget = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 ${
-          isOpen ? 'bg-slate-700 text-white' : 'bg-orange-600 text-white'
+          isOpen ? 'bg-[#4A5E68] text-roti-cream' : 'bg-roti-primary text-roti-cream'
         }`}
       >
         {isOpen ? (
@@ -30,10 +30,10 @@ const FloatingChatWidget = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="absolute bottom-16 right-0 w-[400px] h-[550px] bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 fade-in duration-200">
+        <div className="absolute bottom-16 right-0 w-[400px] h-[550px] bg-[#3A4A51] rounded-2xl shadow-2xl border border-[#4A5E68] overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 fade-in duration-200">
           <ChatHeader />
           {/* We override styles in ChatMessages dynamically using CSS but for now they are styled for light mode. We should make them responsive to dark mode if possible, but the widget can stay slightly light-themed inside to contrast, or we just pass a prop. Let's rely on Tailwind classes. */}
-          <div className="flex-1 bg-slate-900/50 overflow-hidden flex flex-col">
+          <div className="flex-1 bg-roti-dark/50 overflow-hidden flex flex-col">
             <ChatMessages messages={messages} isLoading={isLoading} error={error} />
           </div>
           <ChatInput 

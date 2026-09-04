@@ -6,9 +6,9 @@ import {
   limpiarListos,
 } from '../data/pedidosKDS';
 
-// ─────────────────────────────────────────────────────────────
+// 
 // HELPERS
-// ─────────────────────────────────────────────────────────────
+// 
 const formatPeso = (n) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
 
@@ -27,7 +27,7 @@ const urgenciaClasses = (seg, estado) => {
   if (estado === 'listo') return {
     border: 'border-emerald-500/50',
     header: 'bg-emerald-900/30',
-    badge:  'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    badge:  'bg-roti-success/20 text-emerald-300 border-emerald-500/30',
     timer:  'text-emerald-400',
     glow:   '',
   };
@@ -35,7 +35,7 @@ const urgenciaClasses = (seg, estado) => {
     if (seg > 600) return { // > 10 min en prep
       border: 'border-red-500/70',
       header: 'bg-red-900/30',
-      badge:  'bg-red-500/20 text-red-300 border-red-500/30',
+      badge:  'bg-roti-primary/20 text-red-300 border-red-500/30',
       timer:  'text-red-400',
       glow:   'shadow-lg shadow-red-900/40',
     };
@@ -51,14 +51,14 @@ const urgenciaClasses = (seg, estado) => {
   if (seg > 300) return { // > 5 min esperando
     border: 'border-red-500/70',
     header: 'bg-red-900/30',
-    badge:  'bg-red-500/20 text-red-300 border-red-500/30',
+    badge:  'bg-roti-primary/20 text-red-300 border-red-500/30',
     timer:  'text-red-400',
     glow:   'shadow-lg shadow-red-900/40 animate-pulse',
   };
   return {
     border: 'border-blue-500/40',
     header: 'bg-blue-900/20',
-    badge:  'bg-blue-500/20 text-blue-300 border-blue-500/30',
+    badge:  'bg-roti-secondary/20 text-blue-300 border-blue-500/30',
     timer:  'text-blue-400',
     glow:   '',
   };
@@ -81,9 +81,9 @@ const beep = (freq = 880, duracion = 0.15, volumen = 0.3) => {
   } catch (_) {}
 };
 
-// ─────────────────────────────────────────────────────────────
+// 
 // COMPONENTE: Timer en vivo
-// ─────────────────────────────────────────────────────────────
+// 
 const Timer = ({ timestamp, estado, clases }) => {
   const [seg, setSeg] = useState(() => segundosDesde(timestamp));
 
@@ -100,13 +100,13 @@ const Timer = ({ timestamp, estado, clases }) => {
   );
 };
 
-// ─────────────────────────────────────────────────────────────
+// 
 // COMPONENTE: Tarjeta de pedido
-// ─────────────────────────────────────────────────────────────
+// 
 const ESTADO_CONFIG = {
-  nuevo:      { label: 'Nuevo',        icon: '🆕', next: 'preparando', nextLabel: 'Iniciar preparación' },
-  preparando: { label: 'Preparando…',  icon: '🍳', next: 'listo',      nextLabel: 'Marcar como listo'   },
-  listo:      { label: 'Listo ✓',      icon: '✅', next: null,         nextLabel: null                  },
+  nuevo:      { label: 'Nuevo',        icon: '', next: 'preparando', nextLabel: 'Iniciar preparación' },
+  preparando: { label: 'Preparando',  icon: '', next: 'listo',      nextLabel: 'Marcar como listo'   },
+  listo:      { label: 'Listo ',      icon: '', next: null,         nextLabel: null                  },
 };
 
 const TarjetaPedido = ({ pedido, onCambiarEstado, onEliminar }) => {
@@ -115,19 +115,19 @@ const TarjetaPedido = ({ pedido, onCambiarEstado, onEliminar }) => {
   const clases  = urgenciaClasses(segDesde, pedido.estado);
 
   return (
-    <div className={`flex flex-col bg-slate-800 rounded-2xl border ${clases.border} ${clases.glow}
+    <div className={`flex flex-col bg-[#3A4A51] rounded-2xl border ${clases.border} ${clases.glow}
                      overflow-hidden transition-all duration-300`}>
       {/* Header */}
       <div className={`${clases.header} px-4 py-3 flex items-center justify-between border-b border-white/5`}>
         <div className="flex items-center gap-2">
-          <span className="text-xl font-black text-white tracking-tight">{pedido.numero}</span>
+          <span className="text-xl font-black text-roti-cream tracking-tight">{pedido.numero}</span>
           <span className={`text-xs px-2 py-0.5 rounded-full border font-semibold ${clases.badge}`}>
             {cfg.icon} {cfg.label}
           </span>
         </div>
         <div className="flex items-center gap-3">
           <Timer timestamp={pedido.timestamp} estado={pedido.estado} clases={clases} />
-          <span className="text-xs text-slate-500">{pedido.hora}</span>
+          <span className="text-xs text-roti-cream/50">{pedido.hora}</span>
         </div>
       </div>
 
@@ -136,11 +136,11 @@ const TarjetaPedido = ({ pedido, onCambiarEstado, onEliminar }) => {
         {pedido.items.map((item, idx) => (
           <div key={idx} className="flex items-center gap-3">
             <span className="text-xl flex-shrink-0">{item.emoji}</span>
-            <span className="flex-1 text-sm font-medium text-slate-200">{item.nombre}</span>
+            <span className="flex-1 text-sm font-medium text-roti-cream">{item.nombre}</span>
             <span className={`text-base font-black px-2 py-0.5 rounded-lg ${
               pedido.estado === 'listo'
                 ? 'bg-emerald-900/30 text-emerald-400'
-                : 'bg-slate-700 text-white'
+                : 'bg-[#4A5E68] text-roti-cream'
             }`}>
               ×{item.cantidad}
             </span>
@@ -150,7 +150,7 @@ const TarjetaPedido = ({ pedido, onCambiarEstado, onEliminar }) => {
 
       {/* Footer */}
       <div className="px-4 py-3 border-t border-white/5 flex items-center justify-between gap-2">
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-roti-cream/50">
           {pedido.items.reduce((s, i) => s + i.cantidad, 0)} ítem{pedido.items.reduce((s, i) => s + i.cantidad, 0) !== 1 ? 's' : ''}
           {' · '}{formatPeso(pedido.total)}
         </span>
@@ -159,8 +159,8 @@ const TarjetaPedido = ({ pedido, onCambiarEstado, onEliminar }) => {
           {pedido.estado === 'listo' && (
             <button
               onClick={() => onEliminar(pedido.id)}
-              className="text-xs text-slate-500 hover:text-red-400 transition-colors px-2 py-1 rounded-lg
-                         hover:bg-red-500/10"
+              className="text-xs text-roti-cream/50 hover:text-red-400 transition-colors px-2 py-1 rounded-lg
+                         hover:bg-roti-primary/10"
             >
               Quitar
             </button>
@@ -170,8 +170,8 @@ const TarjetaPedido = ({ pedido, onCambiarEstado, onEliminar }) => {
               onClick={() => onCambiarEstado(pedido.id, cfg.next)}
               className={`text-xs font-semibold px-3 py-1.5 rounded-xl transition-all active:scale-95 ${
                 pedido.estado === 'nuevo'
-                  ? 'bg-amber-500 hover:bg-amber-400 text-white'
-                  : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                  ? 'bg-amber-500 hover:bg-amber-400 text-roti-cream'
+                  : 'bg-roti-success hover:bg-roti-success text-roti-cream'
               }`}
             >
               {cfg.nextLabel}
@@ -183,9 +183,9 @@ const TarjetaPedido = ({ pedido, onCambiarEstado, onEliminar }) => {
   );
 };
 
-// ─────────────────────────────────────────────────────────────
+// 
 // PÁGINA PRINCIPAL: Cocina KDS
-// ─────────────────────────────────────────────────────────────
+// 
 const CocinaKDS = () => {
   const [pedidos, setPedidos] = useState(() => leerPedidosKDS());
   const [sonidoActivo, setSonidoActivo] = useState(true);
@@ -193,7 +193,7 @@ const CocinaKDS = () => {
   const [columnas, setColumnas] = useState(3); // 2 | 3 | 4
   const prevCountRef = useState(() => leerPedidosKDS().filter(p => p.estado === 'nuevo').length);
 
-  // ─── Polling de localStorage cada 2 segundos ─────────────────
+  //  Polling de localStorage cada 2 segundos 
   useEffect(() => {
     const interval = setInterval(() => {
       const nuevos = leerPedidosKDS();
@@ -210,7 +210,7 @@ const CocinaKDS = () => {
     return () => clearInterval(interval);
   }, [sonidoActivo]);
 
-  // ─── Acciones ────────────────────────────────────────────────
+  //  Acciones 
   const handleCambiarEstado = useCallback((id, nuevoEstado) => {
     const actualizada = cambiarEstadoPedido(id, nuevoEstado);
     setPedidos(actualizada);
@@ -232,14 +232,14 @@ const CocinaKDS = () => {
     setPedidos(actualizada);
   }, []);
 
-  // ─── Pedidos filtrados ────────────────────────────────────────
+  //  Pedidos filtrados 
   const pedidosFiltrados = pedidos.filter((p) => {
     if (filtroEstado === 'activos') return p.estado !== 'listo';
     if (filtroEstado === 'listos')  return p.estado === 'listo';
     return true;
   });
 
-  // ─── Stats ───────────────────────────────────────────────────
+  //  Stats 
   const stats = {
     nuevos:     pedidos.filter(p => p.estado === 'nuevo').length,
     preparando: pedidos.filter(p => p.estado === 'preparando').length,
@@ -252,7 +252,7 @@ const CocinaKDS = () => {
     4: 'grid-cols-1 md:grid-cols-2 xl:grid-cols-4',
   }[columnas];
 
-  // ─── Reloj en vivo ───────────────────────────────────────────
+  //  Reloj en vivo 
   const [horaActual, setHoraActual] = useState(
     new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
   );
@@ -263,44 +263,44 @@ const CocinaKDS = () => {
     return () => clearInterval(t);
   }, []);
 
-  // ─────────────────────────────────────────────────────────────
+  // 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] -mx-4 sm:-mx-6 lg:-mx-8 -mt-4 sm:-mt-6 lg:-mt-8 overflow-hidden bg-slate-950">
 
-      {/* ── HEADER ─────────────────────────────────────────── */}
-      <div className="bg-slate-900 border-b border-slate-800 px-4 py-3 flex-shrink-0">
+      {/*  HEADER  */}
+      <div className="bg-roti-dark border-b border-[#3A4A51] px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between gap-4 flex-wrap">
 
           {/* Título + reloj */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
-                <span className="text-lg">🍳</span>
+                <span className="text-lg"></span>
               </div>
               <div>
-                <h1 className="text-base font-bold text-white leading-tight">Cocina — KDS</h1>
-                <p className="text-xs text-slate-500 font-mono">{horaActual}</p>
+                <h1 className="text-base font-bold text-roti-cream leading-tight">Cocina  KDS</h1>
+                <p className="text-xs text-roti-cream/50 font-mono">{horaActual}</p>
               </div>
             </div>
 
             {/* Stats en vivo */}
             <div className="hidden sm:flex items-center gap-2">
               {stats.nuevos > 0 && (
-                <span className="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/25
+                <span className="flex items-center gap-1.5 bg-roti-secondary/10 border border-blue-500/25
                                  text-blue-300 text-xs font-semibold px-2.5 py-1 rounded-full animate-pulse">
-                  🆕 {stats.nuevos} nuevo{stats.nuevos !== 1 ? 's' : ''}
+                   {stats.nuevos} nuevo{stats.nuevos !== 1 ? 's' : ''}
                 </span>
               )}
               {stats.preparando > 0 && (
                 <span className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/25
                                  text-amber-300 text-xs font-semibold px-2.5 py-1 rounded-full">
-                  🍳 {stats.preparando} en prep.
+                   {stats.preparando} en prep.
                 </span>
               )}
               {stats.listos > 0 && (
-                <span className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/25
+                <span className="flex items-center gap-1.5 bg-roti-success/10 border border-emerald-500/25
                                  text-emerald-300 text-xs font-semibold px-2.5 py-1 rounded-full">
-                  ✅ {stats.listos} listo{stats.listos !== 1 ? 's' : ''}
+                   {stats.listos} listo{stats.listos !== 1 ? 's' : ''}
                 </span>
               )}
               {pedidos.length === 0 && (
@@ -312,7 +312,7 @@ const CocinaKDS = () => {
           {/* Controles */}
           <div className="flex items-center gap-2">
             {/* Filtro de vista */}
-            <div className="flex bg-slate-800 rounded-lg border border-slate-700 p-0.5 text-xs">
+            <div className="flex bg-[#3A4A51] rounded-lg border border-[#4A5E68] p-0.5 text-xs">
               {[
                 { v: 'activos', label: 'Activos' },
                 { v: 'listos',  label: 'Listos'  },
@@ -323,8 +323,8 @@ const CocinaKDS = () => {
                   onClick={() => setFiltroEstado(v)}
                   className={`px-2.5 py-1 rounded-md font-medium transition-colors ${
                     filtroEstado === v
-                      ? 'bg-slate-700 text-white'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-[#4A5E68] text-roti-cream'
+                      : 'text-roti-cream/60 hover:text-roti-cream'
                   }`}
                 >
                   {label}
@@ -333,13 +333,13 @@ const CocinaKDS = () => {
             </div>
 
             {/* Columnas */}
-            <div className="hidden md:flex bg-slate-800 rounded-lg border border-slate-700 p-0.5 text-xs gap-0.5">
+            <div className="hidden md:flex bg-[#3A4A51] rounded-lg border border-[#4A5E68] p-0.5 text-xs gap-0.5">
               {[2, 3, 4].map((n) => (
                 <button
                   key={n}
                   onClick={() => setColumnas(n)}
                   className={`w-7 h-7 rounded-md font-bold transition-colors ${
-                    columnas === n ? 'bg-slate-700 text-white' : 'text-slate-500 hover:text-slate-300'
+                    columnas === n ? 'bg-[#4A5E68] text-roti-cream' : 'text-roti-cream/50 hover:text-roti-cream/80'
                   }`}
                   title={`${n} columnas`}
                 >
@@ -354,8 +354,8 @@ const CocinaKDS = () => {
               title={sonidoActivo ? 'Silenciar alertas' : 'Activar alertas'}
               className={`p-2 rounded-lg border transition-colors ${
                 sonidoActivo
-                  ? 'bg-slate-700 border-slate-600 text-amber-400'
-                  : 'bg-slate-800 border-slate-700 text-slate-600'
+                  ? 'bg-[#4A5E68] border-[#4A5E68] text-amber-400'
+                  : 'bg-[#3A4A51] border-[#4A5E68] text-slate-600'
               }`}
             >
               {sonidoActivo ? (
@@ -374,8 +374,8 @@ const CocinaKDS = () => {
             {stats.listos > 0 && (
               <button
                 onClick={handleLimpiarListos}
-                className="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700
-                           text-slate-400 hover:text-white hover:border-slate-600 transition-colors"
+                className="text-xs font-medium px-3 py-1.5 rounded-lg bg-[#3A4A51] border border-[#4A5E68]
+                           text-roti-cream/60 hover:text-roti-cream hover:border-[#4A5E68] transition-colors"
               >
                 Limpiar listos
               </button>
@@ -384,29 +384,29 @@ const CocinaKDS = () => {
         </div>
       </div>
 
-      {/* ── CONTENIDO ──────────────────────────────────────── */}
+      {/*  CONTENIDO  */}
       <div className="flex-1 overflow-y-auto p-4">
         {pedidosFiltrados.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             {pedidos.length === 0 ? (
               <>
-                <div className="text-6xl mb-4 opacity-30">🍳</div>
-                <p className="text-slate-500 font-medium text-lg">Sin pedidos en cocina</p>
+                <div className="text-6xl mb-4 opacity-30"></div>
+                <p className="text-roti-cream/50 font-medium text-lg">Sin pedidos en cocina</p>
                 <p className="text-slate-600 text-sm mt-2 max-w-xs">
                   Cuando se confirme una venta en Caja, el pedido aparecerá aquí automáticamente.
                 </p>
               </>
             ) : (
               <>
-                <div className="text-5xl mb-3 opacity-40">✅</div>
-                <p className="text-slate-500 font-medium">
+                <div className="text-5xl mb-3 opacity-40"></div>
+                <p className="text-roti-cream/50 font-medium">
                   {filtroEstado === 'listos' ? 'No hay pedidos listos' : 'Todos los pedidos están listos'}
                 </p>
                 <button
                   onClick={() => setFiltroEstado('todos')}
                   className="mt-3 text-sm text-orange-400 hover:text-orange-300 transition-colors"
                 >
-                  Ver todos los pedidos →
+                  Ver todos los pedidos 
                 </button>
               </>
             )}
@@ -425,20 +425,20 @@ const CocinaKDS = () => {
         )}
       </div>
 
-      {/* ── LEYENDA ────────────────────────────────────────── */}
-      <div className="flex-shrink-0 border-t border-slate-800 px-4 py-2 bg-slate-900/80
+      {/*  LEYENDA  */}
+      <div className="flex-shrink-0 border-t border-[#3A4A51] px-4 py-2 bg-roti-dark/80
                       flex items-center gap-6 text-xs text-slate-600">
         <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-blue-500"></span> Nuevo pedido
+          <span className="w-2 h-2 rounded-full bg-roti-secondary"></span> Nuevo pedido
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-amber-500"></span> En preparación
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Listo
+          <span className="w-2 h-2 rounded-full bg-roti-success"></span> Listo
         </span>
         <span className="flex items-center gap-1.5 ml-auto">
-          <span className="w-2 h-2 rounded-full bg-red-500"></span> Demorado (&gt;5 min nuevo / &gt;10 min prep)
+          <span className="w-2 h-2 rounded-full bg-roti-primary"></span> Demorado (&gt;5 min nuevo / &gt;10 min prep)
         </span>
       </div>
     </div>

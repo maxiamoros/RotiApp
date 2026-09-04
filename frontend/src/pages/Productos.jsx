@@ -1,9 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-// ─────────────────────────────────────────────────────────────
+// 
 // HELPERS
-// ─────────────────────────────────────────────────────────────
+// 
 const formatPeso = (n) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
 
@@ -19,20 +19,20 @@ const COLORES_CATEGORIA = {
 const badgeClass = (catNombre) => {
   const c = COLORES_CATEGORIA[catNombre] || 'slate';
   const map = {
-    orange: 'bg-orange-500/15 text-orange-300 border-orange-500/25',
-    red:    'bg-red-500/15 text-red-300 border-red-500/25',
+    orange: 'bg-roti-secondary/15 text-orange-300 border-orange-500/25',
+    red:    'bg-roti-primary/15 text-red-300 border-red-500/25',
     amber:  'bg-amber-500/15 text-amber-300 border-amber-500/25',
     lime:   'bg-lime-500/15 text-lime-300 border-lime-500/25',
     sky:    'bg-sky-500/15 text-sky-300 border-sky-500/25',
     pink:   'bg-pink-500/15 text-pink-300 border-pink-500/25',
-    slate:  'bg-slate-600/30 text-slate-300 border-slate-600/30',
+    slate:  'bg-slate-600/30 text-roti-cream/80 border-[#4A5E68]/30',
   };
   return map[c] || map.slate;
 };
 
-// ─────────────────────────────────────────────────────────────
+// 
 // MODAL: Formulario de producto (crear / editar)
-// ─────────────────────────────────────────────────────────────
+// 
 const FORM_VACIO = { nombre: '', precio: '', imagenUrl: '', archivoImagen: null, categoriaId: '', receta: [] };
 
 const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar }) => {
@@ -93,13 +93,13 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
+      <div className="bg-[#3A4A51] rounded-2xl border border-[#4A5E68] shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">
-            {esEdicion ? '✏️ Editar producto' : '➕ Nuevo producto'}
+        <div className="px-6 py-4 border-b border-[#4A5E68] flex items-center justify-between">
+          <h2 className="text-lg font-bold text-roti-cream">
+            {esEdicion ? '️ Editar producto' : ' Nuevo producto'}
           </h2>
-          <button onClick={onCancelar} className="text-slate-400 hover:text-white transition-colors p-1">
+          <button onClick={onCancelar} className="text-roti-cream/60 hover:text-roti-cream transition-colors p-1">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
               <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/>
             </svg>
@@ -110,7 +110,7 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
           <form id="prod-form" onSubmit={handleSubmit} className="space-y-5">
             <div className="flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-roti-cream/60 uppercase tracking-wider mb-1.5">
                   Nombre del producto *
                 </label>
                 <input
@@ -118,17 +118,17 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
                   value={form.nombre}
                   onChange={(e) => set('nombre', e.target.value)}
                   placeholder="Ej: Empanada Carne"
-                  className={`w-full bg-slate-900 border rounded-xl px-3 py-2.5 text-white text-sm
+                  className={`w-full bg-roti-dark border rounded-xl px-3 py-2.5 text-roti-cream text-sm
                               placeholder-slate-600 focus:outline-none transition-colors
                               ${errores.nombre
                                 ? 'border-red-500 focus:ring-1 focus:ring-red-500/30'
-                                : 'border-slate-600 focus:border-orange-500'}`}
+                                : 'border-[#4A5E68] focus:border-orange-500'}`}
                 />
                 {errores.nombre && <p className="text-xs text-red-400 mt-1">{errores.nombre}</p>}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-roti-cream/60 uppercase tracking-wider mb-1.5">
                   Imagen del Producto
                 </label>
                 
@@ -138,16 +138,16 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
                     <img 
                       src={form.archivoImagen ? URL.createObjectURL(form.archivoImagen) : (form.imagenUrl.startsWith('/uploads') ? `http://localhost:3001${form.imagenUrl}` : form.imagenUrl)} 
                       alt="Preview" 
-                      className="h-24 rounded-lg object-cover border border-slate-600"
+                      className="h-24 rounded-lg object-cover border border-[#4A5E68]"
                     />
-                    <button type="button" onClick={() => { set('archivoImagen', null); set('imagenUrl', ''); }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600">×</button>
+                    <button type="button" onClick={() => { set('archivoImagen', null); set('imagenUrl', ''); }} className="absolute -top-2 -right-2 bg-roti-primary text-roti-cream rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-roti-primary">×</button>
                   </div>
                 )}
                 
                 <div className="flex flex-col gap-3">
                   {/* Archivo local */}
                   <div className="flex items-center">
-                    <label className="flex-1 cursor-pointer bg-slate-900 border border-slate-600 border-dashed rounded-xl px-3 py-2 text-center text-sm text-slate-400 hover:text-orange-400 hover:border-orange-500 transition-colors">
+                    <label className="flex-1 cursor-pointer bg-roti-dark border border-[#4A5E68] border-dashed rounded-xl px-3 py-2 text-center text-sm text-roti-cream/60 hover:text-orange-400 hover:border-orange-500 transition-colors">
                       <span className="flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5zM10 5.25a.75.75 0 01.75.75v6.5a.75.75 0 01-1.5 0v-6.5A.75.75 0 0110 5.25z" clipRule="evenodd"/></svg>
                         Subir foto desde PC
@@ -168,13 +168,13 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
                   
                   {/* URL Externa */}
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500">o usa URL:</span>
+                    <span className="text-xs text-roti-cream/50">o usa URL:</span>
                     <input
                       type="url"
                       value={form.imagenUrl || ''}
                       onChange={(e) => { set('imagenUrl', e.target.value); set('archivoImagen', null); }}
                       placeholder="https://ejemplo.com/imagen.jpg"
-                      className="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white text-xs placeholder-slate-600 focus:outline-none focus:border-orange-500 transition-colors"
+                      className="flex-1 bg-roti-dark border border-[#4A5E68] rounded-lg px-3 py-2 text-roti-cream text-xs placeholder-slate-600 focus:outline-none focus:border-orange-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -182,51 +182,51 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-roti-cream/60 uppercase tracking-wider mb-1.5">
                 Precio (ARS) *
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-roti-cream/60 text-sm font-medium">$</span>
                 <input
                   type="number"
                   value={form.precio}
                   onChange={(e) => set('precio', e.target.value)}
                   placeholder="0"
                   min="1"
-                  className={`w-full bg-slate-900 border rounded-xl pl-7 pr-3 py-2.5 text-white text-sm
+                  className={`w-full bg-roti-dark border rounded-xl pl-7 pr-3 py-2.5 text-roti-cream text-sm
                               placeholder-slate-600 focus:outline-none transition-colors
                               ${errores.precio
                                 ? 'border-red-500 focus:ring-1 focus:ring-red-500/30'
-                                : 'border-slate-600 focus:border-orange-500'}`}
+                                : 'border-[#4A5E68] focus:border-orange-500'}`}
                 />
               </div>
               {errores.precio && <p className="text-xs text-red-400 mt-1">{errores.precio}</p>}
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-roti-cream/60 uppercase tracking-wider mb-1.5">
                 Categoría
               </label>
               <select
                 value={form.categoriaId}
                 onChange={(e) => set('categoriaId', e.target.value)}
-                className="w-full bg-slate-900 border border-slate-600 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-orange-500"
+                className="w-full bg-roti-dark border border-[#4A5E68] rounded-xl px-3 py-2.5 text-roti-cream text-sm focus:outline-none focus:border-orange-500"
               >
                 <option value="">-- Sin categoría --</option>
                 {categorias.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.emoji} {cat.nombre}</option>
+                  <option key={cat.id} value={cat.id}>{cat.nombre}</option>
                 ))}
               </select>
             </div>
 
             {/* Constructor de Recetas */}
-            <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-700">
+            <div className="bg-roti-dark/50 rounded-xl p-4 border border-[#4A5E68]">
               <div className="flex items-center justify-between mb-3">
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-roti-cream/60 uppercase tracking-wider">
                   Receta / Insumos
                 </label>
                 <button type="button" onClick={agregarInsumo}
-                  className="text-xs bg-orange-600/20 text-orange-400 px-2 py-1 rounded hover:bg-orange-600 hover:text-white transition-colors">
+                  className="text-xs bg-roti-primary/20 text-orange-400 px-2 py-1 rounded hover:bg-roti-primary hover:text-roti-cream transition-colors">
                   + Agregar Insumo
                 </button>
               </div>
@@ -238,7 +238,7 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
                     <select
                       value={r.insumoId}
                       onChange={(e) => cambiarInsumo(i, 'insumoId', e.target.value)}
-                      className="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-xs text-white"
+                      className="flex-1 bg-[#3A4A51] border border-[#4A5E68] rounded-lg px-2 py-1.5 text-xs text-roti-cream"
                     >
                       <option value="">Select Insumo</option>
                       {insumos.map(ins => (
@@ -250,7 +250,7 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
                       value={r.cantidad}
                       onChange={(e) => cambiarInsumo(i, 'cantidad', e.target.value)}
                       step="0.01"
-                      className="w-20 bg-slate-800 border border-slate-600 rounded-lg px-2 py-1.5 text-xs text-white"
+                      className="w-20 bg-[#3A4A51] border border-[#4A5E68] rounded-lg px-2 py-1.5 text-xs text-roti-cream"
                       placeholder="Cant."
                     />
                     <button type="button" onClick={() => quitarInsumo(i)} className="text-red-400 hover:text-red-300">
@@ -259,7 +259,7 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
                   </div>
                 ))}
                 {form.receta.length === 0 && (
-                  <p className="text-xs text-slate-500 italic">No se agregaron insumos. Este producto no descontará stock.</p>
+                  <p className="text-xs text-roti-cream/50 italic">No se agregaron insumos. Este producto no descontará stock.</p>
                 )}
               </div>
             </div>
@@ -267,13 +267,13 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
           </form>
         </div>
 
-        <div className="border-t border-slate-700 p-6 flex gap-3">
+        <div className="border-t border-[#4A5E68] p-6 flex gap-3">
           <button type="button" onClick={onCancelar}
-            className="flex-1 py-2.5 rounded-xl border border-slate-600 text-slate-300 hover:bg-slate-700 text-sm font-medium transition-colors">
+            className="flex-1 py-2.5 rounded-xl border border-[#4A5E68] text-roti-cream/80 hover:bg-[#4A5E68] text-sm font-medium transition-colors">
             Cancelar
           </button>
           <button type="submit" form="prod-form"
-            className="flex-1 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold transition-colors">
+            className="flex-1 py-2.5 rounded-xl bg-roti-primary hover:bg-roti-secondary text-roti-cream text-sm font-bold transition-colors">
             {esEdicion ? 'Guardar cambios' : 'Crear producto'}
           </button>
         </div>
@@ -282,44 +282,44 @@ const ModalProducto = ({ producto, categorias, insumos, onGuardar, onCancelar })
   );
 };
 
-// ─────────────────────────────────────────────────────────────
+// 
 // TOAST
-// ─────────────────────────────────────────────────────────────
+// 
 const Toast = ({ msg, tipo = 'success', onClose }) => {
   const config = {
-    success: { bg: 'bg-emerald-700', shadow: 'shadow-emerald-900/40', icon: '✅' },
-    error:   { bg: 'bg-red-700',     shadow: 'shadow-red-900/40',     icon: '❌' },
-    info:    { bg: 'bg-slate-700',   shadow: 'shadow-slate-900/40',   icon: 'ℹ️' },
+    success: { bg: 'bg-emerald-700', shadow: 'shadow-emerald-900/40', icon: '' },
+    error:   { bg: 'bg-red-700',     shadow: 'shadow-red-900/40',     icon: '' },
+    info:    { bg: 'bg-[#4A5E68]',   shadow: 'shadow-slate-900/40',   icon: '️' },
   }[tipo];
   return (
-    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 ${config.bg} text-white
+    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 ${config.bg} text-roti-cream
                     px-5 py-3.5 rounded-xl shadow-xl ${config.shadow} max-w-xs`}>
       <span className="text-lg">{config.icon}</span>
       <span className="text-sm font-medium">{msg}</span>
-      <button onClick={onClose} className="ml-auto text-white/70 hover:text-white text-lg leading-none">×</button>
+      <button onClick={onClose} className="ml-auto text-roti-cream/70 hover:text-roti-cream text-lg leading-none">×</button>
     </div>
   );
 };
 
-// ─────────────────────────────────────────────────────────────
+// 
 // TARJETA DE PRODUCTO
-// ─────────────────────────────────────────────────────────────
+// 
 const ProductoCard = ({ producto, onEditar, onEliminar }) => (
-  <div className={`group relative bg-slate-800 border rounded-xl p-4 transition-all duration-200 hover:border-slate-600 hover:shadow-lg border-slate-700`}>
+  <div className={`group relative bg-[#3A4A51] border rounded-xl p-4 transition-all duration-200 hover:border-[#4A5E68] hover:shadow-lg border-[#4A5E68]`}>
     
     {/* Contenido */}
     <div className="flex items-start gap-3 mb-3">
       {producto.imagenUrl ? (
-        <img src={producto.imagenUrl.startsWith('/uploads') ? `http://localhost:3001${producto.imagenUrl}` : producto.imagenUrl} alt={producto.nombre} className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-slate-900 border border-slate-700" />
+        <img src={producto.imagenUrl.startsWith('/uploads') ? `http://localhost:3001${producto.imagenUrl}` : producto.imagenUrl} alt={producto.nombre} className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-roti-dark border border-[#4A5E68]" />
       ) : (
-        <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-slate-700 text-slate-400 flex-shrink-0 text-xs text-center p-1">
+        <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#4A5E68] text-roti-cream/60 flex-shrink-0 text-xs text-center p-1">
           Sin imagen
         </div>
       )}
       <div className="min-w-0 pr-14">
-        <h3 className="text-sm font-semibold text-white leading-tight truncate">{producto.nombre}</h3>
+        <h3 className="text-sm font-semibold text-roti-cream leading-tight truncate">{producto.nombre}</h3>
         <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full border ${badgeClass(producto.categoriaNombre)}`}>
-          {producto.emoji} {producto.categoriaNombre}
+          {producto.categoriaNombre}
         </span>
       </div>
     </div>
@@ -330,11 +330,11 @@ const ProductoCard = ({ producto, onEditar, onEliminar }) => (
       {/* Acciones */}
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <button onClick={() => onEditar(producto)} title="Editar"
-          className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-700 hover:text-blue-400 transition-colors">
+          className="p-1.5 rounded-lg text-roti-cream/60 hover:bg-[#4A5E68] hover:text-blue-400 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z"/><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0010 3H4.75A2.75 2.75 0 002 5.75v9.5A2.75 2.75 0 004.75 18h9.5A2.75 2.75 0 0017 15.25V10a.75.75 0 00-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5z"/></svg>
         </button>
         <button onClick={() => onEliminar(producto)} title="Eliminar"
-          className="p-1.5 rounded-lg text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors">
+          className="p-1.5 rounded-lg text-roti-cream/60 hover:bg-roti-primary/10 hover:text-red-400 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clipRule="evenodd"/></svg>
         </button>
       </div>
@@ -342,9 +342,9 @@ const ProductoCard = ({ producto, onEditar, onEliminar }) => (
   </div>
 );
 
-// ─────────────────────────────────────────────────────────────
+// 
 // PÁGINA PRINCIPAL
-// ─────────────────────────────────────────────────────────────
+// 
 const Productos = () => {
   const { token } = useAuth();
   const [productos, setProductos] = useState([]);
@@ -459,26 +459,26 @@ const Productos = () => {
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Gestión de Productos</h1>
-          <p className="mt-1 text-slate-400 text-sm">Administra tu menú y asigna recetas para el inventario.</p>
+          <h1 className="text-3xl font-bold text-roti-cream tracking-tight">Gestión de Productos</h1>
+          <p className="mt-1 text-roti-cream/60 text-sm">Administra tu menú y asigna recetas para el inventario.</p>
         </div>
         <button onClick={() => setModalEditar('nuevo')}
-          className="flex items-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-xl text-sm transition-colors shadow-lg active:scale-95">
+          className="flex items-center gap-2 px-4 py-2.5 bg-roti-primary hover:bg-roti-secondary text-roti-cream font-semibold rounded-xl text-sm transition-colors shadow-lg active:scale-95">
           + Nuevo producto
         </button>
       </div>
 
-      <div className="bg-slate-800/60 rounded-xl border border-slate-700 p-4 space-y-3">
+      <div className="bg-[#3A4A51]/60 rounded-xl border border-[#4A5E68] p-4 space-y-3">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <input type="text" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Buscar por nombre..."
-              className="w-full bg-slate-900 border border-slate-600 rounded-xl pl-4 pr-3 py-2 text-sm text-slate-200 focus:border-orange-500 transition-colors" />
+              className="w-full bg-roti-dark border border-[#4A5E68] rounded-xl pl-4 pr-3 py-2 text-sm text-roti-cream focus:border-orange-500 transition-colors" />
           </div>
           <select value={ordenPor} onChange={(e) => setOrdenPor(e.target.value)}
-            className="bg-slate-900 border border-slate-600 rounded-xl px-3 py-2 text-sm text-slate-300 focus:border-orange-500 transition-colors">
+            className="bg-roti-dark border border-[#4A5E68] rounded-xl px-3 py-2 text-sm text-roti-cream/80 focus:border-orange-500 transition-colors">
             <option value="nombre">Ordenar: Nombre A-Z</option>
-            <option value="precio_asc">Ordenar: Precio ↑</option>
-            <option value="precio_desc">Ordenar: Precio ↓</option>
+            <option value="precio_asc">Ordenar: Precio </option>
+            <option value="precio_desc">Ordenar: Precio </option>
             <option value="categoria">Ordenar: Categoría</option>
           </select>
         </div>
@@ -490,9 +490,9 @@ const Productos = () => {
             return (
               <button key={cat} onClick={() => setCategoriaActiva(cat)}
                 className={`flex-shrink-0 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
-                  categoriaActiva === cat ? 'bg-orange-500 border-orange-500 text-white' : 'bg-slate-800 border-slate-600 text-slate-400 hover:text-slate-200'
+                  categoriaActiva === cat ? 'bg-roti-secondary border-orange-500 text-roti-cream' : 'bg-[#3A4A51] border-[#4A5E68] text-roti-cream/60 hover:text-roti-cream'
                 }`}>
-                {cat !== 'Todas' && <span>{emoji}</span>} {cat} <span className="bg-slate-700 px-1.5 py-0.5 rounded-full">{count}</span>
+                {cat} <span className="bg-[#4A5E68] px-1.5 py-0.5 rounded-full">{count}</span>
               </button>
             );
           })}
@@ -500,8 +500,8 @@ const Productos = () => {
       </div>
 
       {productosFiltrados.length === 0 ? (
-        <div className="text-center py-20 text-slate-500">
-          <p className="text-base font-medium text-slate-400">No hay productos que coincidan</p>
+        <div className="text-center py-20 text-roti-cream/50">
+          <p className="text-base font-medium text-roti-cream/60">No hay productos que coincidan</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">

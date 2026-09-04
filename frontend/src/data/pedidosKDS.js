@@ -1,6 +1,6 @@
-// ─────────────────────────────────────────────────────────────
-// Store de pedidos KDS — compartido entre Caja y Cocina KDS
-// ─────────────────────────────────────────────────────────────
+// 
+// Store de pedidos KDS  compartido entre Caja y Cocina KDS
+// 
 
 const LS_KEY = 'rotiseria_pedidos_kds';
 
@@ -17,16 +17,16 @@ const LS_KEY = 'rotiseria_pedidos_kds';
  * @typedef {'nuevo' | 'preparando' | 'listo'} EstadoPedido
  *
  * @typedef {Object} PedidoKDS
- * @property {number}       id          — timestamp único
- * @property {string}       numero      — "#001", "#002"…
- * @property {string}       hora        — "20:30"
- * @property {number}       timestamp   — ms desde epoch
- * @property {ItemPedido[]} items       — ítems del carrito
+ * @property {number}       id           timestamp único
+ * @property {string}       numero       "#001", "#002"
+ * @property {string}       hora         "20:30"
+ * @property {number}       timestamp    ms desde epoch
+ * @property {ItemPedido[]} items        ítems del carrito
  * @property {number}       total
- * @property {string}       metodo      — 'efectivo' | 'debito' | ...
+ * @property {string}       metodo       'efectivo' | 'debito' | ...
  * @property {EstadoPedido} estado
- * @property {number|null}  inicioPrep  — timestamp cuando pasó a "preparando"
- * @property {number|null}  finPrep     — timestamp cuando pasó a "listo"
+ * @property {number|null}  inicioPrep   timestamp cuando pasó a "preparando"
+ * @property {number|null}  finPrep      timestamp cuando pasó a "listo"
  */
 
 /** Lee la lista de pedidos KDS desde localStorage */

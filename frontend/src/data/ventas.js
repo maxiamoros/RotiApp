@@ -1,7 +1,7 @@
-// ─────────────────────────────────────────────────────────────
-// Store de Ventas — persistencia en localStorage
+// 
+// Store de Ventas  persistencia en localStorage
 // Usado por Caja (escritura) y Reportes (lectura)
-// ─────────────────────────────────────────────────────────────
+// 
 
 const LS_KEY = 'rotiseria_ventas';
 
@@ -15,11 +15,11 @@ const LS_KEY = 'rotiseria_ventas';
  *
  * @typedef {Object} Venta
  * @property {number}     id
- * @property {string}     hora          — "20:30"
- * @property {number}     timestamp     — ms epoch
+ * @property {string}     hora           "20:30"
+ * @property {number}     timestamp      ms epoch
  * @property {VentaItem[]}items
  * @property {number}     total
- * @property {string}     metodo        — 'efectivo'|'debito'|'credito'|'qr'
+ * @property {string}     metodo         'efectivo'|'debito'|'credito'|'qr'
  * @property {number}     efectivoRecibido
  * @property {number}     vuelto
  */
@@ -39,7 +39,7 @@ export function registrarVenta(venta) {
   return actualizada;
 }
 
-// ─── Helpers de análisis ──────────────────────────────────────
+//  Helpers de análisis 
 
 /** Filtra ventas por rango de fecha */
 export function ventasDelPeriodo(ventas, desde, hasta) {

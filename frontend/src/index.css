@@ -1,7 +1,238 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Great+Vibes&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@theme {
+  --color-roti-dark: #2A363B;
+  --color-roti-primary: #E84A5F;
+  --color-roti-secondary: #FF847C;
+  --color-roti-cream: #FECEA8;
+  --color-roti-success: #99B898;
+  /* New Landing theme */
+  --color-stone-950: #0a0a0a;
+  --color-stone-900: #121212;
+  --color-stone-800: #1a1a1a;
+  --color-orange-vibrant: #ff8c00;
+  --color-gold: #d4a843;
+}
 
 @layer base {
   body {
-    @apply bg-slate-900 text-slate-100;
+    @apply bg-[#2A363B] text-[#FECEA8];
+    font-family: 'Inter', sans-serif;
   }
+
+  .font-script {
+    font-family: 'Great Vibes', cursive;
+  }
+
+  .font-serif-display {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+/* ===== LANDING PAGE STYLES ===== */
+
+/* Slate/stone texture background */
+.bg-stone-texture {
+  background-color: #0d0d0d;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(212, 168, 67, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(255, 140, 0, 0.05) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+}
+
+/* Navbar glass effect */
+.navbar-glass {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(212, 168, 67, 0.15);
+}
+
+/* Navbar transparent (on top of hero) */
+.navbar-transparent {
+  background: transparent;
+}
+
+/* Hero gradient overlay */
+.hero-overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.6) 40%,
+    rgba(0, 0, 0, 0.1) 70%,
+    transparent 100%
+  );
+}
+
+/* Slide animations */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatBounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 140, 0, 0.4); }
+  50% { box-shadow: 0 0 40px rgba(255, 140, 0, 0.8), 0 0 60px rgba(255, 140, 0, 0.3); }
+}
+
+@keyframes whatsapp-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }
+  50% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+}
+
+@keyframes slideTransition {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s ease-out 0.2s both;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s ease-out forwards;
+}
+
+.animate-float {
+  animation: floatBounce 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-whatsapp-pulse {
+  animation: whatsapp-pulse 2s ease-in-out infinite;
+}
+
+.animate-slide-transition {
+  animation: slideTransition 0.7s ease-out forwards;
+}
+
+/* Gold text gradient */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #d4a843 0%, #f5d080 50%, #d4a843 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Orange CTA button */
+.btn-orange-cta {
+  background: linear-gradient(135deg, #ff8c00 0%, #e67e00 100%);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(255, 140, 0, 0.35);
+}
+.btn-orange-cta:hover {
+  background: linear-gradient(135deg, #ff9f1c 0%, #ff8c00 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 140, 0, 0.5);
+}
+
+/* WhatsApp float button */
+.btn-whatsapp {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  animation: whatsapp-pulse 2s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+.btn-whatsapp:hover {
+  transform: scale(1.1);
+}
+
+/* Nav link hover */
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #ff8c00;
+  transition: width 0.3s ease;
+}
+.nav-link:hover::after {
+  width: 100%;
+}
+.nav-link:hover {
+  color: #ff8c00;
+}
+
+/* Slider dots */
+.slider-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.slider-dot.active {
+  background: #ff8c00;
+  width: 28px;
+  border-radius: 5px;
+}
+
+/* Flour/spice particles effect */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  animation: particleFade 4s ease-in-out infinite;
+}
+
+@keyframes particleFade {
+  0% { opacity: 0; transform: translateY(0) scale(0.5); }
+  30% { opacity: 0.3; }
+  70% { opacity: 0.1; }
+  100% { opacity: 0; transform: translateY(-80px) scale(1); }
+}
+
+/* Hide scrollbar */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Admin navbar (existing style kept) */
+.navbar-admin {
+  background: #1e2b30;
+  border-bottom: 1px solid #3A4A51;
+}
+
+@media print {
+  body * { visibility: hidden; }
+  .print-only, .print-only * { visibility: visible; }
+  .print-only {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block !important;
+    width: 80mm;
+    padding: 0;
+    margin: 0;
+  }
+  @page { margin: 0; }
 }

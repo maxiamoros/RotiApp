@@ -1,476 +1,491 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { agregarPedidoKDS, leerPedidosKDS } from '../data/pedidosKDS';
+import { agregarPedidoKDS } from '../data/pedidosKDS';
 
-// ─────────────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────────────
 const formatPeso = (n) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
 
-const INFO_LOCAL = {
-  nombre:    'Rotisería Central',
-  slogan:    'Sabor casero, calidad de siempre',
-  direccion: 'Av. San Martín 1240, Local 3',
-  telefono:  '(011) 4523-8891',
-  horario:   'Lun–Sáb: 11:00 – 23:00 · Dom: 12:00 – 22:00',
-  whatsapp:  '5491145238891',
-};
+// Colores:
+// BG: #2A363B
+// ACTION: #E84A5F
+// PRECIOS: #FECEA8
 
-// ─────────────────────────────────────────────────────────────
-// COMPONENTE: Botón flotante del carrito
-// ─────────────────────────────────────────────────────────────
-const BtnCarrito = ({ cantidad, onClick }) => (
-  <button
-    onClick={onClick}
-    className="fixed bottom-6 right-6 z-40 flex items-center gap-2 bg-orange-600 hover:bg-orange-500
-               text-white px-5 py-3.5 rounded-2xl shadow-2xl shadow-orange-900/50 font-bold
-               text-sm transition-all active:scale-95 hover:scale-105"
+// Screensaver Component
+const Screensaver = ({ onStart, message }) => (
+  <div 
+    className="fixed inset-0 z-[100] flex flex-col items-center justify-center cursor-pointer transition-all bg-[#2A363B] no-print"
+    onClick={onStart}
   >
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-      <path d="M1 1.75A.75.75 0 011.75 1h1.628a1.75 1.75 0 011.734 1.51L5.43 3h13.345a.75.75 0 01.742.868l-1.313 7.89a1.75 1.75 0 01-1.725 1.492H6.325a1.75 1.75 0 01-1.722-1.44L3.256 3.22a.25.25 0 00-.248-.22H1.75A.75.75 0 011 1.75zM6 17.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15.5 17.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
-    </svg>
-    Mi pedido
-    <span className="bg-white text-orange-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-black">
-      {cantidad}
-    </span>
-  </button>
-);
-
-// ─────────────────────────────────────────────────────────────
-// COMPONENTE: Card de producto en el menú
-// ─────────────────────────────────────────────────────────────
-const MenuCard = ({ producto, enCarrito, onAgregar, onQuitar }) => (
-  <div className="group bg-white/5 hover:bg-white/10 border border-white/10 hover:border-orange-500/40
-                  rounded-2xl p-4 transition-all duration-200 flex flex-col gap-3 h-full">
-    <div className="flex items-start gap-3">
-      {producto.imagenUrl ? (
-        <img src={producto.imagenUrl} alt={producto.nombre} className="w-16 h-16 rounded-xl object-cover border border-slate-700 flex-shrink-0" />
-      ) : (
-        <span className="text-3xl mt-0.5 flex-shrink-0">{producto.emoji || '🍽️'}</span>
-      )}
-      <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-white text-sm leading-tight">{producto.nombre}</h3>
-        <p className="text-orange-400 font-bold mt-1 text-base">{formatPeso(producto.precio)}</p>
+    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-20"></div>
+    <div className="relative z-10 flex flex-col items-center animate-pulse">
+      <div className="w-40 h-40 bg-[#E84A5F] rounded-full flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(232,74,95,0.6)]">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-20 h-20 text-white">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" />
+        </svg>
       </div>
-    </div>
-
-    <div className="mt-auto">
-      {enCarrito > 0 ? (
-        <div className="flex items-center justify-between bg-orange-600/20 border border-orange-500/30 rounded-xl px-3 py-1.5">
-          <button onClick={() => onQuitar(producto.id)}
-            className="text-orange-300 hover:text-white text-xl font-bold w-7 h-7 flex items-center justify-center
-                       rounded-lg hover:bg-orange-500/30 transition-colors">
-            −
-          </button>
-          <span className="text-white font-bold text-sm">{enCarrito} en pedido</span>
-          <button onClick={() => onAgregar(producto)}
-            className="text-orange-300 hover:text-white text-xl font-bold w-7 h-7 flex items-center justify-center
-                       rounded-lg hover:bg-orange-500/30 transition-colors">
-            +
-          </button>
-        </div>
-      ) : (
-        <button onClick={() => onAgregar(producto)}
-          className="w-full py-1.5 rounded-xl border border-orange-500/50 text-orange-400 hover:bg-orange-600
-                     hover:text-white hover:border-orange-600 text-sm font-semibold transition-all active:scale-95">
-          + Agregar
-        </button>
-      )}
+      <h1 className="text-6xl font-black text-white text-center tracking-tight shadow-black drop-shadow-2xl uppercase whitespace-pre-wrap">
+        {message}
+      </h1>
     </div>
   </div>
 );
 
-// ─────────────────────────────────────────────────────────────
-// COMPONENTE: Panel del carrito (drawer lateral / modal)
-// ─────────────────────────────────────────────────────────────
-const PanelCarrito = ({ carrito, onCerrar, onConfirmar, onCambiarCantidad }) => {
-  const [nombre, setNombre] = useState('');
-  const [mesa, setMesa]     = useState('');
-  const [paso, setPaso]     = useState(1);
-  const [error, setError]   = useState('');
+// Product Card Component
+const ProductCard = ({ producto, onClick }) => (
+  <div 
+    onClick={() => onClick(producto)}
+    className="bg-white/5 border border-white/10 rounded-3xl p-4 flex flex-col gap-4 active:scale-95 transition-transform cursor-pointer h-full"
+  >
+    {producto.imagenUrl ? (
+      <img src={producto.imagenUrl} alt={producto.nombre} className="w-full h-40 rounded-2xl object-cover shadow-lg" />
+    ) : (
+      <div className="w-full h-40 rounded-2xl bg-white/5 flex items-center justify-center">
+        <span className="text-white/30 text-lg">Sin Imagen</span>
+      </div>
+    )}
+    <div className="flex-1 flex flex-col justify-between">
+      <h3 className="text-xl font-bold text-white leading-tight">{producto.nombre}</h3>
+      <p className="text-[#FECEA8] font-black text-2xl mt-2">{formatPeso(producto.precio)}</p>
+    </div>
+  </div>
+);
 
-  const subtotal = carrito.reduce((s, i) => s + i.precio * i.cantidad, 0);
+// Customization Modal
+const ModalPersonalizacion = ({ producto, onClose, onConfirm }) => {
+  const [cantidad, setCantidad] = useState(1);
+  const [aclaracion, setAclaracion] = useState('');
 
-  const handleConfirmar = () => {
-    if (!nombre.trim()) { setError('Por favor ingresá tu nombre'); return; }
-    onConfirmar({ nombre: nombre.trim(), mesa: mesa.trim() });
-    setPaso(3);
-  };
+  const opAclaraciones = [
+    "Sin sal", "Poca sal", "Sin condimentos", "Bien cocido", "Para compartir"
+  ];
 
   return (
-    <div className="fixed inset-0 z-50 flex">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCerrar} />
-      <div className="relative ml-auto w-full max-w-md bg-slate-900 border-l border-slate-800 flex flex-col h-full shadow-2xl">
-        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between flex-shrink-0 bg-slate-900">
-          <h2 className="text-lg font-bold text-white">
-            {paso === 1 ? '🛒 Tu pedido' : paso === 2 ? '📝 Tus datos' : '✅ ¡Pedido enviado!'}
-          </h2>
-          <button onClick={onCerrar} className="text-slate-400 hover:text-white p-1 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
-          </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
+      <div className="bg-[#2A363B] w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+        <div className="p-8 border-b border-white/10 flex gap-6 items-center">
+          {producto.imagenUrl && (
+            <img src={producto.imagenUrl} alt={producto.nombre} className="w-32 h-32 rounded-2xl object-cover shadow-md" />
+          )}
+          <div>
+            <h2 className="text-3xl font-bold text-white">{producto.nombre}</h2>
+            <p className="text-3xl font-black text-[#FECEA8] mt-2">{formatPeso(producto.precio)}</p>
+          </div>
         </div>
 
-        {paso === 1 && (
-          <>
-            <div className="flex-1 overflow-y-auto px-5 py-3 space-y-2">
-              {carrito.length === 0 ? (
-                <div className="text-center py-16 text-slate-500">
-                  <p className="text-4xl mb-3">🛒</p>
-                  <p className="text-sm">Tu pedido está vacío</p>
-                  <p className="text-xs mt-1 text-slate-600">Explorá el menú y agregá productos</p>
-                </div>
-              ) : (
-                carrito.map((item) => (
-                  <div key={item.id} className="flex items-center gap-3 py-2 border-b border-slate-800 last:border-0">
-                    {item.imagenUrl ? (
-                      <img src={item.imagenUrl} alt={item.nombre} className="w-10 h-10 rounded object-cover" />
-                    ) : (
-                      <span className="text-xl">{item.emoji || '🍽️'}</span>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white truncate">{item.nombre}</p>
-                      <p className="text-xs text-slate-400">{formatPeso(item.precio)} c/u</p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => onCambiarCantidad(item.id, -1)}
-                        className="w-6 h-6 rounded bg-slate-700 hover:bg-slate-600 text-slate-300 flex items-center justify-center text-sm font-bold transition-colors">
-                        −
-                      </button>
-                      <span className="w-6 text-center text-sm font-bold text-white">{item.cantidad}</span>
-                      <button onClick={() => onCambiarCantidad(item.id, +1)}
-                        className="w-6 h-6 rounded bg-slate-700 hover:bg-orange-600 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold transition-colors">
-                        +
-                      </button>
-                    </div>
-                    <span className="text-sm font-semibold text-white w-16 text-right">
-                      {formatPeso(item.precio * item.cantidad)}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-            {carrito.length > 0 && (
-              <div className="border-t border-slate-800 p-5 space-y-3 flex-shrink-0">
-                <div className="flex justify-between text-base font-bold">
-                  <span className="text-slate-300">Total</span>
-                  <span className="text-orange-400 text-xl">{formatPeso(subtotal)}</span>
-                </div>
-                <button onClick={() => setPaso(2)}
-                  className="w-full py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl text-base transition-all active:scale-95">
-                  Continuar →
+        <div className="p-8 flex-1 overflow-y-auto space-y-8">
+          <div>
+            <h3 className="text-xl font-bold text-white mb-4">Aclaraciones</h3>
+            <div className="flex flex-wrap gap-3">
+              {opAclaraciones.map(op => (
+                <button 
+                  key={op}
+                  onClick={() => setAclaracion(prev => prev === op ? '' : op)}
+                  className={`px-5 py-3 rounded-xl text-lg font-semibold transition-colors ${aclaracion === op ? 'bg-[#E84A5F] text-white' : 'bg-white/10 text-white/70 active:bg-white/20'}`}
+                >
+                  {op}
                 </button>
-              </div>
-            )}
-          </>
-        )}
-
-        {paso === 2 && (
-          <div className="flex-1 flex flex-col">
-            <div className="flex-1 px-5 py-5 space-y-4">
-              <div className="bg-slate-800 rounded-xl p-3 space-y-1 border border-slate-700">
-                {carrito.map(i => (
-                  <div key={i.id} className="flex justify-between text-sm">
-                    <span className="text-slate-300">{i.emoji || '🍽️'} {i.nombre} ×{i.cantidad}</span>
-                    <span className="text-slate-400">{formatPeso(i.precio * i.cantidad)}</span>
-                  </div>
-                ))}
-                <div className="flex justify-between text-sm font-bold border-t border-slate-700 pt-2 mt-2">
-                  <span className="text-white">Total</span>
-                  <span className="text-orange-400">{formatPeso(subtotal)}</span>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Tu nombre *</label>
-                <input type="text" value={nombre} onChange={e => { setNombre(e.target.value); setError(''); }}
-                  placeholder="Ej: María García"
-                  className={`w-full bg-slate-800 border rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none transition-colors text-sm ${error ? 'border-red-500' : 'border-slate-600 focus:border-orange-500'}`} />
-                {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Mesa / Referencia (opcional)</label>
-                <input type="text" value={mesa} onChange={e => setMesa(e.target.value)}
-                  placeholder="Ej: Mesa 4, Para llevar, Pedido online…"
-                  className="w-full bg-slate-800 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-orange-500 transition-colors text-sm" />
-              </div>
+              ))}
             </div>
-
-            <div className="border-t border-slate-800 p-5 flex gap-3 flex-shrink-0">
-              <button onClick={() => setPaso(1)}
-                className="flex-1 py-2.5 rounded-xl border border-slate-600 text-slate-300 hover:bg-slate-800 text-sm font-medium transition-colors">
-                ← Volver
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-bold text-white mb-4">Cantidad</h3>
+            <div className="flex items-center gap-6">
+              <button 
+                onClick={() => setCantidad(c => Math.max(1, c - 1))}
+                className="w-16 h-16 rounded-2xl bg-white/10 text-white text-3xl font-bold active:bg-white/20 flex items-center justify-center"
+              >
+                -
               </button>
-              <button onClick={handleConfirmar}
-                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold transition-colors">
-                Confirmar pedido ✓
+              <span className="text-4xl font-black text-white w-12 text-center">{cantidad}</span>
+              <button 
+                onClick={() => setCantidad(c => c + 1)}
+                className="w-16 h-16 rounded-2xl bg-[#E84A5F] text-white text-3xl font-bold active:bg-red-600 flex items-center justify-center"
+              >
+                +
               </button>
             </div>
           </div>
-        )}
+        </div>
 
-        {paso === 3 && (
-          <div className="flex-1 flex flex-col items-center justify-center px-8 text-center gap-4">
-            <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center">
-              <span className="text-5xl">✅</span>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-white mb-2">¡Pedido enviado a cocina!</h3>
-              <p className="text-slate-400 text-sm">Gracias <strong className="text-white">{nombre}</strong>. Tu pedido está siendo preparado.</p>
-              {mesa && <p className="text-slate-500 text-xs mt-1">Referencia: {mesa}</p>}
-            </div>
-            <div className="bg-slate-800 rounded-xl p-4 w-full border border-slate-700">
-              <p className="text-xs text-slate-400 mb-2">Tu pedido ({formatPeso(subtotal)})</p>
-              {carrito.map(i => <p key={i.id} className="text-sm text-slate-300">{i.emoji || '🍽️'} {i.nombre} ×{i.cantidad}</p>)}
-            </div>
-            <button onClick={onCerrar}
-              className="w-full py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl text-sm transition-colors mt-2">
-              Seguir explorando el menú
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────
-// COMPONENTE: Seguimiento de pedido
-// ─────────────────────────────────────────────────────────────
-const ESTADO_PASOS = [
-  { key: 'nuevo',      label: 'Recibido',          icon: '📥', desc: 'Tu pedido fue recibido' },
-  { key: 'preparando', label: 'En preparación',     icon: '🍳', desc: 'Estamos cocinando tu pedido' },
-  { key: 'listo',      label: '¡Listo para retirar!',icon: '✅', desc: 'Podés pasar a buscar tu pedido' },
-];
-
-const SeguimientoPedido = ({ pedidoId, onCerrar }) => {
-  const [pedido, setPedido] = useState(null);
-
-  useEffect(() => {
-    const buscar = () => {
-      const todos = leerPedidosKDS();
-      const encontrado = todos.find(p => p.id === pedidoId);
-      setPedido(encontrado || null);
-    };
-    buscar();
-    const iv = setInterval(buscar, 2000);
-    return () => clearInterval(iv);
-  }, [pedidoId]);
-
-  if (!pedido) return null;
-
-  const pasoActual = ESTADO_PASOS.findIndex(p => p.key === pedido.estado);
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl w-full max-w-sm p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="font-bold text-white text-lg">Seguimiento</h3>
-          <button onClick={onCerrar} className="text-slate-400 hover:text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+        <div className="p-6 border-t border-white/10 flex gap-4">
+          <button 
+            onClick={onClose}
+            className="flex-1 py-5 rounded-2xl bg-white/10 text-white text-xl font-bold active:bg-white/20 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button 
+            onClick={() => onConfirm({ ...producto, cantidad, aclaracion })}
+            className="flex-[2] py-5 rounded-2xl bg-[#E84A5F] text-white text-xl font-bold active:bg-red-600 transition-colors shadow-lg"
+          >
+            Agregar {formatPeso(producto.precio * cantidad)}
           </button>
         </div>
-
-        <div className="space-y-3 mb-5">
-          {ESTADO_PASOS.map((paso, idx) => {
-            const completado = idx < pasoActual;
-            const actual     = idx === pasoActual;
-            return (
-              <div key={paso.key} className={`flex items-center gap-4 p-3 rounded-xl border transition-all ${
-                actual ? 'border-orange-500/50 bg-orange-500/10' : completado ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-slate-800 opacity-40'
-              }`}>
-                <span className={`text-2xl ${actual ? 'animate-bounce' : ''}`}>{paso.icon}</span>
-                <div>
-                  <p className={`text-sm font-bold ${actual ? 'text-orange-300' : completado ? 'text-emerald-400' : 'text-slate-500'}`}>{paso.label}</p>
-                  {actual && <p className="text-xs text-slate-400">{paso.desc}</p>}
-                </div>
-                {completado && (
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-emerald-400 ml-auto"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd"/></svg>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {pedido.estado === 'listo' && (
-          <div className="bg-emerald-900/30 border border-emerald-500/30 rounded-xl p-3 text-center">
-            <p className="text-emerald-300 font-bold text-sm">🎉 ¡Tu pedido está listo!</p>
-            <p className="text-emerald-400/70 text-xs mt-0.5">Pasá a retirar en mostrador</p>
-          </div>
-        )}
       </div>
     </div>
   );
 };
 
-// ─────────────────────────────────────────────────────────────
-// PÁGINA PRINCIPAL: Portal del Cliente
-// ─────────────────────────────────────────────────────────────
-const PortalCliente = () => {
+
+export default function PortalCliente() {
   const { token } = useAuth();
+  const [welcomeMessage, setWelcomeMessage] = useState('TOCA LA PANTALLA\nPARA COMENZAR');
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  
   const [carrito, setCarrito] = useState([]);
   const [catActiva, setCatActiva] = useState('Todas');
-  const [busqueda, setBusqueda] = useState('');
-  const [mostrarCarrito, setMostrarCarrito] = useState(false);
-  const [pedidoId, setPedidoId] = useState(null);
-  const [animBounce, setAnimBounce] = useState(false);
-  const headerRef = useRef(null);
+  
+  const [modalProd, setModalProd] = useState(null);
+  
+  // Idle State
+  const [isIdle, setIsIdle] = useState(true);
+  const idleTimeout = useRef(null);
 
+  // Pago
+  const [paso, setPaso] = useState(1); // 1: Menú, 2: Pagar (Opciones), 3: Éxito
+  const [metodoPago, setMetodoPago] = useState('');
+  const [numPedido, setNumPedido] = useState(null);
+
+  // Data fetch
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [resProd, resCat] = await Promise.all([
+        const [resConf, resProd, resCat] = await Promise.all([
+          fetch('http://localhost:3001/api/config', { headers: { 'Authorization': `Bearer ${token}` } }),
           fetch('http://localhost:3001/api/productos', { headers: { 'Authorization': `Bearer ${token}` } }),
           fetch('http://localhost:3001/api/categorias', { headers: { 'Authorization': `Bearer ${token}` } })
         ]);
-        if(resProd.ok) setProductos(await resProd.json());
-        if(resCat.ok) setCategorias(await resCat.json());
+        if(resConf.ok) {
+          const conf = await resConf.json();
+          if(conf.welcomeMessage) setWelcomeMessage(conf.welcomeMessage);
+        }
+        if(resProd.ok) {
+          const prods = await resProd.json();
+          setProductos(prods.filter(p => p.activo !== false));
+        }
+        if(resCat.ok) {
+          const cats = await resCat.json();
+          setCategorias(cats.filter(c => c.activo !== false));
+        }
       } catch(err) { console.error(err); }
     };
     fetchData();
-  }, [token]);
+  }, [token, isIdle]); // Reload config on idle
 
+  // Activity Tracker
+  const resetIdle = () => {
+    if (isIdle) {
+      setIsIdle(false);
+      setCarrito([]); // Limpiar carrito al iniciar
+      setPaso(1);
+    }
+    if (idleTimeout.current) clearTimeout(idleTimeout.current);
+    // 30 seconds of inactivity -> show screensaver
+    idleTimeout.current = setTimeout(() => {
+      setIsIdle(true);
+      setModalProd(null);
+      setPaso(1);
+    }, 30000);
+  };
+
+  useEffect(() => {
+    // Escuchar eventos globales
+    const evts = ['touchstart', 'click', 'mousemove', 'scroll'];
+    evts.forEach(e => window.addEventListener(e, resetIdle));
+    resetIdle();
+    return () => evts.forEach(e => window.removeEventListener(e, resetIdle));
+  }, [isIdle]);
+
+  // Derived state
   const categoriasMenu = ['Todas', ...categorias.map(c => c.nombre).filter(c => productos.some(p => p.categoriaNombre === c))];
-
+  
   const productosFiltrados = useMemo(() => {
-    return productos.filter(p => {
-      const matchCat  = catActiva === 'Todas' || p.categoriaNombre === catActiva;
-      const matchBusq = p.nombre.toLowerCase().includes(busqueda.toLowerCase());
-      return matchCat && matchBusq;
-    });
-  }, [productos, catActiva, busqueda]);
+    return productos.filter(p => catActiva === 'Todas' || p.categoriaNombre === catActiva);
+  }, [productos, catActiva]);
 
-  const totalItems = carrito.reduce((s, i) => s + i.cantidad, 0);
+  const subtotal = carrito.reduce((s, i) => s + i.precio * i.cantidad, 0);
 
-  const agregar = (producto) => {
+  // Actions
+  const agregarAlCarrito = (item) => {
     setCarrito(prev => {
-      const existe = prev.find(i => i.id === producto.id);
-      return existe ? prev.map(i => i.id === producto.id ? { ...i, cantidad: i.cantidad + 1 } : i) : [...prev, { ...producto, cantidad: 1 }];
+      // Buscar si ya existe con la misma aclaracion
+      const idx = prev.findIndex(i => i.id === item.id && i.aclaracion === item.aclaracion);
+      if (idx >= 0) {
+        const nuevo = [...prev];
+        nuevo[idx].cantidad += item.cantidad;
+        return nuevo;
+      }
+      return [...prev, item];
     });
-    setAnimBounce(true);
-    setTimeout(() => setAnimBounce(false), 400);
+    setModalProd(null);
   };
 
-  const cambiarCantidad = (id, delta) => {
-    setCarrito(prev => prev.map(i => i.id === id ? { ...i, cantidad: i.cantidad + delta } : i).filter(i => i.cantidad > 0));
+  const quitarDelCarrito = (idx) => {
+    setCarrito(prev => prev.filter((_, i) => i !== idx));
   };
-  const quitarUno = (id) => cambiarCantidad(id, -1);
 
-  const confirmarPedido = async ({ nombre, mesa }) => {
-    const itemsDetalle = carrito.map((i) => ({ id: i.id, nombre: i.nombre, emoji: i.emoji, cantidad: i.cantidad, precio: i.precio, imagenUrl: i.imagenUrl }));
-    const total  = carrito.reduce((s, i) => s + i.precio * i.cantidad, 0);
-    const nota   = [nombre, mesa].filter(Boolean).join(' — ');
+  const procesarPago = async (metodo) => {
+    setMetodoPago(metodo);
+    // Generar numero random para ticket
+    const ticketNum = Math.floor(Math.random() * 900) + 100; 
+    setNumPedido(ticketNum);
 
+    // Preparar Items para KDS
+    const itemsDetalle = carrito.map(i => ({ 
+      id: i.id, 
+      nombre: i.nombre + (i.aclaracion ? ` (${i.aclaracion})` : ''), 
+      cantidad: i.cantidad, 
+      precio: i.precio,
+      imagenUrl: i.imagenUrl 
+    }));
+    
     try {
-      // 1. Guardar en backend (descuenta inventario)
+      const nota = `Ticket #${ticketNum} - Pago: ${metodo}`;
+      
       const res = await fetch('http://localhost:3001/api/ventas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ items: itemsDetalle, total, metodo: 'portal', estado: 'completado' })
+        body: JSON.stringify({ items: itemsDetalle, total: subtotal, metodo: metodo === 'Efectivo' ? 'efectivo' : 'mercadopago', estado: 'completado' })
       });
       if(!res.ok) throw new Error('Error al registrar venta');
       
-      // 2. Guardar en KDS local
+      // KDS Local
       const idKDS = Date.now();
       const hora = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-      agregarPedidoKDS({ id: idKDS, hora, timestamp: idKDS, items: itemsDetalle, total, metodo: 'portal', nota });
-      setPedidoId(idKDS);
-    } catch(err) {
-      console.error(err);
-      alert('Hubo un error al procesar el pedido');
+      agregarPedidoKDS({ id: idKDS, hora, timestamp: idKDS, items: itemsDetalle, total: subtotal, metodo: 'totem', nota });
+      
+      setPaso(3);
+      
+      // Trigger print after a short delay to allow DOM to update
+      setTimeout(() => {
+        window.print();
+      }, 500);
+
+    } catch(e) {
+      alert('Error procesando pedido. Ve a la caja por favor.');
     }
   };
 
-  const cerrarCarritoYVaciar = () => {
-    setMostrarCarrito(false);
-    if (pedidoId) {
-      setCarrito([]);
-      setPedidoId(null);
-    }
-  };
+  // Rendering
+  if (isIdle) return <Screensaver onStart={resetIdle} message={welcomeMessage} />;
 
   return (
-    <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mt-4 sm:-mt-6 lg:-mt-8">
-      <div ref={headerRef} className="relative bg-gradient-to-br from-slate-900 via-orange-950/30 to-slate-900 border-b border-orange-900/30 overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
+    <div className="fixed inset-0 bg-[#2A363B] flex overflow-hidden font-sans select-none z-[1000] no-print">
+      
+      {/* LEFT COL: Categories & Products */}
+      <div className="flex-1 flex flex-col h-full bg-[#2A363B]">
+        {/* Header / Tabs */}
+        <div className="bg-[#2A363B] p-6 shadow-md z-10 flex gap-4 overflow-x-auto snap-x hide-scrollbar">
+          {categoriasMenu.map(cat => (
+            <button 
+              key={cat} 
+              onClick={() => setCatActiva(cat)}
+              className={`snap-start flex-shrink-0 px-8 py-5 rounded-2xl text-2xl font-black uppercase tracking-wide transition-colors ${
+                catActiva === cat ? 'bg-[#E84A5F] text-white shadow-lg' : 'bg-white/10 text-white/60 active:bg-white/20'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
-        <div className="relative max-w-5xl mx-auto px-6 py-12 sm:py-16 text-center">
-          <div className="text-5xl mb-3">🏪</div>
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight">{INFO_LOCAL.nombre}</h1>
-          <p className="text-orange-300/80 text-lg mt-2 font-medium">{INFO_LOCAL.slogan}</p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-400">
-            <span className="flex items-center gap-1.5"><span>📍</span> {INFO_LOCAL.direccion}</span>
-            <span className="flex items-center gap-1.5"><span>🕐</span> {INFO_LOCAL.horario}</span>
-            <a href={`tel:${INFO_LOCAL.telefono}`} className="flex items-center gap-1.5 hover:text-orange-400 transition-colors"><span>📞</span> {INFO_LOCAL.telefono}</a>
+
+        {/* Products Grid */}
+        <div className="flex-1 overflow-y-auto p-6 bg-[#2A363B]">
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+            {productosFiltrados.map(p => (
+              <ProductCard key={p.id} producto={p} onClick={setModalProd} />
+            ))}
           </div>
-          <a href={`https://wa.me/${INFO_LOCAL.whatsapp}?text=Hola!%20Quisiera%20hacer%20un%20pedido`} target="_blank" rel="noreferrer"
-             className="inline-flex items-center gap-2 mt-5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-lg shadow-emerald-900/30">
-            Pedir por WhatsApp
-          </a>
+          <div className="h-32" /> {/* Bottom spacing */}
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        <div className="space-y-3 sticky top-0 bg-slate-900/95 backdrop-blur-sm py-3 -mx-4 px-4 sm:-mx-6 sm:px-6 z-30 border-b border-slate-800">
-          <div className="relative">
-            <input type="text" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar en el menú..."
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-4 pr-3 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:border-orange-500 transition-colors"/>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {categoriasMenu.map(cat => {
-              const emoji = cat === 'Todas' ? '' : categorias.find(c => c.nombre === cat)?.emoji;
-              return (
-              <button key={cat} onClick={() => setCatActiva(cat)}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold border transition-all ${
-                  catActiva === cat ? 'bg-orange-600 border-orange-600 text-white shadow-lg' : 'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-200'
-                }`}>
-                {cat !== 'Todas' && <span>{emoji} </span>}{cat}
-              </button>
-              )
-            })}
-          </div>
+      {/* RIGHT COL: Cart Panel */}
+      <div className="w-[450px] bg-[#1e272b] flex flex-col border-l border-white/5 shadow-[-10px_0_30px_rgba(0,0,0,0.5)]">
+        <div className="p-6 bg-[#161c1f]">
+          <h2 className="text-3xl font-black text-white uppercase tracking-wider">Tu Pedido</h2>
         </div>
-
-        {busqueda ? (
-          <div>
-            <p className="text-xs text-slate-500 mb-3">{productosFiltrados.length} resultado{productosFiltrados.length !== 1 ? 's' : ''}</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {productosFiltrados.map(p => <MenuCard key={p.id} producto={p} enCarrito={carrito.find(i => i.id === p.id)?.cantidad || 0} onAgregar={agregar} onQuitar={quitarUno}/>)}
+        
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {carrito.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center opacity-30">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-24 h-24 text-white mb-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+              </svg>
+              <p className="text-2xl font-bold text-white text-center">Todavía no hay<br/>nada por aquí</p>
             </div>
+          ) : (
+            carrito.map((item, idx) => (
+              <div key={idx} className="bg-white/5 rounded-2xl p-4 flex gap-4 items-center">
+                <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white font-black text-xl">
+                  {item.cantidad}
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-white font-bold text-lg leading-tight">{item.nombre}</h4>
+                  {item.aclaracion && <p className="text-white/50 text-sm mt-1">{item.aclaracion}</p>}
+                  <p className="text-[#FECEA8] font-bold text-lg mt-1">{formatPeso(item.precio * item.cantidad)}</p>
+                </div>
+                <button 
+                  onClick={() => quitarDelCarrito(idx)}
+                  className="w-12 h-12 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center active:bg-red-500/40"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-6 h-6"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Total & Checkout Button */}
+        <div className="p-6 bg-[#161c1f]">
+          <div className="flex justify-between items-end mb-6">
+            <span className="text-white/60 text-xl font-bold uppercase">Total</span>
+            <span className="text-[#FECEA8] text-4xl font-black">{formatPeso(subtotal)}</span>
           </div>
-        ) : (
-          categoriasMenu.filter(c => c !== 'Todas').map(cat => {
-            const prods = productosFiltrados.filter(p => p.categoriaNombre === cat);
-            if (prods.length === 0) return null;
-            const emoji = categorias.find(c => c.nombre === cat)?.emoji;
-            return (
-              <section key={cat} id={`cat-${cat}`}>
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-2xl">{emoji}</span>
-                  <h2 className="text-xl font-bold text-white">{cat}</h2>
-                  <span className="text-sm text-slate-500">{prods.length} opciones</span>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                  {prods.map(p => <MenuCard key={p.id} producto={p} enCarrito={carrito.find(i => i.id === p.id)?.cantidad || 0} onAgregar={agregar} onQuitar={quitarUno}/>)}
-                </div>
-              </section>
-            );
-          })
-        )}
-        {productosFiltrados.length === 0 && <div className="text-center py-20 text-slate-500"><p className="text-sm">No encontramos productos.</p></div>}
-        <div className="h-20" />
+          <button 
+            disabled={carrito.length === 0}
+            onClick={() => setPaso(2)}
+            className="w-full py-6 rounded-2xl bg-[#E84A5F] text-white text-2xl font-black uppercase tracking-wider active:bg-red-600 transition-colors disabled:opacity-50 disabled:active:bg-[#E84A5F]"
+          >
+            Pagar Pedido
+          </button>
+        </div>
       </div>
 
-      {totalItems > 0 && <div className={animBounce ? 'animate-bounce' : ''}><BtnCarrito cantidad={totalItems} onClick={() => setMostrarCarrito(true)} /></div>}
-      {mostrarCarrito && <PanelCarrito carrito={carrito} onCerrar={cerrarCarritoYVaciar} onConfirmar={confirmarPedido} onCambiarCantidad={cambiarCantidad} />}
-      {pedidoId && !mostrarCarrito && <SeguimientoPedido pedidoId={pedidoId} onCerrar={() => { setPedidoId(null); setCarrito([]); }} />}
+      {/* MODALS */}
+      {modalProd && <ModalPersonalizacion producto={modalProd} onClose={() => setModalProd(null)} onConfirm={agregarAlCarrito} />}
+      
+      {/* PAGO MODAL */}
+      {paso === 2 && (
+        <div className="fixed inset-0 z-[150] bg-black/90 flex flex-col items-center justify-center p-8">
+          <h2 className="text-5xl font-black text-white mb-12 text-center uppercase">¿Cómo querés pagar?</h2>
+          <div className="flex gap-8 max-w-4xl w-full">
+            <button 
+              onClick={() => procesarPago('Efectivo')}
+              className="flex-1 bg-[#2A363B] border-4 border-white/10 rounded-3xl p-12 flex flex-col items-center gap-6 active:border-[#E84A5F] transition-all"
+            >
+              <div className="w-32 h-32 bg-green-500/20 rounded-full flex items-center justify-center">
+                <span className="text-6xl">💵</span>
+              </div>
+              <span className="text-4xl font-bold text-white">Efectivo</span>
+              <span className="text-xl text-white/50 text-center">Pagás en caja al retirar</span>
+            </button>
+            <button 
+              onClick={() => procesarPago('Mercado Pago')}
+              className="flex-1 bg-[#2A363B] border-4 border-[#009EE3]/50 rounded-3xl p-12 flex flex-col items-center gap-6 active:border-[#009EE3] transition-all"
+            >
+              <div className="w-32 h-32 bg-[#009EE3]/20 rounded-full flex items-center justify-center">
+                <span className="text-6xl">📱</span>
+              </div>
+              <span className="text-4xl font-bold text-[#009EE3]">Mercado Pago</span>
+              <span className="text-xl text-white/50 text-center">Escaneás el QR en caja</span>
+            </button>
+          </div>
+          <button 
+            onClick={() => setPaso(1)}
+            className="mt-12 px-12 py-5 rounded-2xl border-2 border-white/20 text-white text-2xl font-bold active:bg-white/10"
+          >
+            Volver al pedido
+          </button>
+        </div>
+      )}
+
+      {/* EXITO MODAL */}
+      {paso === 3 && (
+        <div className="fixed inset-0 z-[200] bg-[#E84A5F] flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-300 no-print">
+          <div className="w-48 h-48 bg-white rounded-full flex items-center justify-center mb-12 shadow-2xl">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-24 h-24 text-[#E84A5F]">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+          </div>
+          <h2 className="text-6xl font-black text-white mb-6 uppercase">¡Pedido Confirmado!</h2>
+          <p className="text-3xl text-white/90 font-medium mb-12">Por favor recordá este número:</p>
+          
+          <div className="bg-white px-16 py-8 rounded-3xl shadow-2xl mb-12">
+            <span className="text-3xl text-[#2A363B] font-bold uppercase tracking-widest block mb-2">Pedido</span>
+            <span className="text-8xl text-[#2A363B] font-black">#{numPedido}</span>
+          </div>
+
+          <p className="text-2xl text-white/80 max-w-2xl">
+            {metodoPago === 'Efectivo' 
+              ? 'Acercate a la caja para abonar y retirar tu pedido.' 
+              : 'Acercate a la caja para escanear el QR y retirar tu pedido.'}
+          </p>
+
+          {/* Autoclose hint */}
+          <div className="mt-16 text-white/50 text-xl flex items-center gap-2">
+            <svg className="animate-spin h-6 w-6 text-white/50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Volviendo al inicio...
+          </div>
+        </div>
+      )}
+      
+      {/* TICKET DE IMPRESION OCULTO */}
+      {paso === 3 && (
+        <div className="print-only hidden font-mono text-black bg-white w-[80mm] p-4">
+          <div className="text-center mb-4">
+            <h1 className="text-3xl font-black mb-1">ROTISERIA ANTI</h1>
+            <p className="text-sm text-black">Fecha: {new Date().toLocaleDateString('es-AR')}</p>
+            <p className="text-sm text-black">Hora: {new Date().toLocaleTimeString('es-AR')}</p>
+          </div>
+          
+          <div className="text-center mb-4 border-y-2 border-black border-dashed py-3">
+            <p className="text-sm font-bold">PEDIDO TÓTEM</p>
+            <h2 className="text-6xl font-black mt-2">#{numPedido}</h2>
+            <p className="text-sm font-bold mt-2 uppercase">Pago: {metodoPago}</p>
+          </div>
+
+          <div className="mb-4">
+            {carrito.map((i, idx) => (
+              <div key={idx} className="mb-2 text-sm font-bold">
+                <div className="flex justify-between">
+                  <span className="w-8">{i.cantidad}x</span>
+                  <span className="flex-1 px-1">{i.nombre}</span>
+                  <span className="w-16 text-right">${i.precio * i.cantidad}</span>
+                </div>
+                {i.aclaracion && <div className="pl-9 text-xs mt-1">* {i.aclaracion}</div>}
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t-2 border-black border-dashed pt-3 pb-8 flex justify-between font-black text-xl">
+            <span>TOTAL:</span>
+            <span>${subtotal}</span>
+          </div>
+
+          <div className="text-center mt-6 text-sm font-bold pb-12">
+            ¡GRACIAS POR TU COMPRA!
+            <br />
+            Retirá por mostrador
+          </div>
+        </div>
+      )}
+
+      {/* Hide scrollbars globally for this component */}
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @media print {
+          body * { visibility: hidden; }
+          .print-only, .print-only * { visibility: visible; }
+          .print-only {
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: block !important;
+            width: 80mm;
+            padding: 0;
+            margin: 0;
+          }
+          @page { margin: 0; }
+        }
+      `}</style>
     </div>
   );
-};
-
-export default PortalCliente;
+}

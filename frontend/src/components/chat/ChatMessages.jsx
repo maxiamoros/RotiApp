@@ -29,7 +29,7 @@ const formatInline = (text) =>
   text
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`(.+?)`/g, '<code class="bg-white/10 px-1 rounded text-xs font-mono">$1</code>');
+    .replace(/`(.+?)`/g, '<code class="bg-roti-cream/10 px-1 rounded text-xs font-mono">$1</code>');
 
 const ChatMessages = ({ messages, isLoading }) => {
   const bottomRef = useRef(null);
@@ -43,15 +43,15 @@ const ChatMessages = ({ messages, isLoading }) => {
       {messages.map((msg, index) => (
         <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
           {msg.role === 'assistant' && (
-            <div className="w-7 h-7 rounded-full bg-orange-600/20 border border-orange-500/30
+            <div className="w-7 h-7 rounded-full bg-roti-primary/20 border border-orange-500/30
                             flex items-center justify-center text-sm flex-shrink-0 mr-2 mt-0.5">
-              🤖
+              
             </div>
           )}
           <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
             msg.role === 'user'
-              ? 'bg-orange-600 text-white rounded-tr-none'
-              : 'bg-slate-700/80 border border-slate-600/50 text-slate-200 rounded-tl-none'
+              ? 'bg-roti-primary text-roti-cream rounded-tr-none'
+              : 'bg-[#4A5E68]/80 border border-[#4A5E68]/50 text-roti-cream rounded-tl-none'
           }`}>
             <div className="space-y-1">
               {renderMarkdown(msg.content)}
@@ -62,11 +62,11 @@ const ChatMessages = ({ messages, isLoading }) => {
 
       {isLoading && (
         <div className="flex justify-start items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-orange-600/20 border border-orange-500/30
+          <div className="w-7 h-7 rounded-full bg-roti-primary/20 border border-orange-500/30
                           flex items-center justify-center text-sm flex-shrink-0">
-            🤖
+            
           </div>
-          <div className="bg-slate-700/80 border border-slate-600/50 rounded-2xl rounded-tl-none
+          <div className="bg-[#4A5E68]/80 border border-[#4A5E68]/50 rounded-2xl rounded-tl-none
                           px-4 py-3 flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-orange-400 animate-bounce" style={{ animationDelay: '0ms' }} />
             <div className="w-2 h-2 rounded-full bg-orange-400 animate-bounce" style={{ animationDelay: '150ms' }} />

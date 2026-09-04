@@ -5,7 +5,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, token } = useAuth();
 
   if (!token) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
   if (allowedRoles && !allowedRoles.includes(user?.rol)) {
@@ -15,6 +15,9 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
         return <Navigate to="/cocina" replace />;
       case 'CAJERO':
         return <Navigate to="/caja" replace />;
+      case 'TOTEM':
+      case 'CLIENTE':
+        return <Navigate to="/cliente" replace />;
       default:
         return <Navigate to="/admin" replace />;
     }

@@ -1,6 +1,6 @@
-// ─────────────────────────────────────────────────────────────
-// Store de Inventario — persistencia en localStorage
-// ─────────────────────────────────────────────────────────────
+// 
+// Store de Inventario  persistencia en localStorage
+// 
 
 const LS_INSUMOS   = 'rotiseria_inventario_insumos';
 const LS_MOVIM     = 'rotiseria_inventario_movimientos';
@@ -13,14 +13,14 @@ export const CATEGORIAS_INV = [
 export const UNIDADES = ['kg', 'g', 'L', 'ml', 'unidades', 'docenas', 'cajas', 'bolsas'];
 
 export const EMOJIS_CAT_INV = {
-  'Carnes':               '🥩',
-  'Lácteos':              '🧀',
-  'Harinas y Masas':      '🌾',
-  'Verduras':             '🥬',
+  'Carnes':               '',
+  'Lácteos':              '',
+  'Harinas y Masas':      '',
+  'Verduras':             '',
   'Aceites y Condimentos':'🫙',
-  'Envases':              '📦',
-  'Bebidas':              '🥤',
-  'Otros':                '🗂️',
+  'Envases':              '',
+  'Bebidas':              '',
+  'Otros':                '️',
 };
 
 export const INSUMOS_INICIALES = [
@@ -58,7 +58,7 @@ export const INSUMOS_INICIALES = [
   { id: 25, nombre: 'Agua Mineral 500ml',      categoria: 'Bebidas',             stock: 36,   stockMinimo: 20,  unidad: 'unidades', precio: 650  },
 ];
 
-// ─── Estado de stock ──────────────────────────────────────────
+//  Estado de stock 
 export function estadoStock(insumo) {
   const ratio = insumo.stock / insumo.stockMinimo;
   if (insumo.stock <= 0)    return 'agotado';
@@ -68,13 +68,13 @@ export function estadoStock(insumo) {
 }
 
 export const ESTADO_STOCK_CFG = {
-  ok:      { label: 'OK',      color: 'emerald', dot: 'bg-emerald-500' },
+  ok:      { label: 'OK',      color: 'emerald', dot: 'bg-roti-success' },
   bajo:    { label: 'Bajo',    color: 'amber',   dot: 'bg-amber-500'  },
-  critico: { label: 'Crítico', color: 'red',     dot: 'bg-red-500'    },
+  critico: { label: 'Crítico', color: 'red',     dot: 'bg-roti-primary'    },
   agotado: { label: 'Agotado', color: 'red',     dot: 'bg-red-700'    },
 };
 
-// ─── CRUD ─────────────────────────────────────────────────────
+//  CRUD 
 export function leerInsumos() {
   try {
     const raw = localStorage.getItem(LS_INSUMOS);
@@ -87,7 +87,7 @@ export function guardarInsumos(lista) {
   localStorage.setItem(LS_INSUMOS, JSON.stringify(lista));
 }
 
-// ─── Movimientos ──────────────────────────────────────────────
+//  Movimientos 
 export function leerMovimientos() {
   try {
     const raw = localStorage.getItem(LS_MOVIM);
