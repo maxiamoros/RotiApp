@@ -27,6 +27,7 @@ model Producto {
   nombre      String
   precio      Float
   imagenUrl   String?
+  promptIA    String?
   activo      Boolean      @default(true)
   categoriaId Int?
   categoria   Categoria?   @relation(fields: [categoriaId], references: [id])

@@ -27,7 +27,7 @@ const getProductos = async (req, res) => {
 
 const createProducto = async (req, res) => {
   try {
-    const { nombre, precio, imagenUrl, categoriaId, receta, activo } = req.body;
+    const { nombre, precio, imagenUrl, promptIA, categoriaId, receta, activo } = req.body;
     
     // receta debe ser un array de { insumoId, cantidad }
 
@@ -36,6 +36,7 @@ const createProducto = async (req, res) => {
         nombre,
         precio: parseFloat(precio),
         imagenUrl,
+        promptIA,
         activo: activo !== undefined ? activo : true,
         categoriaId: categoriaId ? parseInt(categoriaId) : null,
         receta: receta ? {
@@ -61,7 +62,7 @@ const createProducto = async (req, res) => {
 const updateProducto = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, precio, imagenUrl, categoriaId, receta, activo } = req.body;
+    const { nombre, precio, imagenUrl, promptIA, categoriaId, receta, activo } = req.body;
 
     // Primero actualizamos los datos básicos y borramos receta antigua si se envía una nueva
     const productoActualizado = await prisma.producto.update({
@@ -70,6 +71,7 @@ const updateProducto = async (req, res) => {
         nombre,
         precio: parseFloat(precio),
         imagenUrl,
+        promptIA,
         activo: activo !== undefined ? activo : undefined,
         categoriaId: categoriaId ? parseInt(categoriaId) : null,
         // Si mandamos receta, recreamos las relaciones
