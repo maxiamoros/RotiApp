@@ -4,7 +4,7 @@
   "description": "Sistema de gestión para Rotisería Central",
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
-    "build": "npx prisma generate --schema=./prisma/schema.prisma && cd frontend && npm install && npm run build"
+    "build": "npx prisma generate --schema=./prisma/schema.prisma && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
