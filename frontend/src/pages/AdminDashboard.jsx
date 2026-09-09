@@ -18,7 +18,7 @@ const AdminDashboard = () => {
 
   const fetchUsuarios = async () => {
     try {
-      const response = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/usuarios`, {
+      const response = await fetch(`\/api/usuarios`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -42,7 +42,7 @@ const AdminDashboard = () => {
     setError('');
     
     try {
-      const response = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/usuarios`, {
+      const response = await fetch(`\/api/usuarios`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ const AdminDashboard = () => {
     setError('');
 
     try {
-      const response = await fetch(`\${import.meta.env.VITE_API_URL || 'https://rotiapp.onrender.com'}/api/usuarios/${usuarioEditando.id}`, {
+      const response = await fetch(`\/api/usuarios/${usuarioEditando.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

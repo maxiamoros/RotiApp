@@ -6,9 +6,19 @@
     "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
   },
   "dependencies": {
-    "concurrently": "^10.0.5"
+    "concurrently": "^10.0.5",
+    "@google/generative-ai": "^0.24.1",
+    "@prisma/client": "^6.19.3",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.3.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.3"
+    "@tailwindcss/postcss": "^4.3.3",
+    "nodemon": "^3.1.14",
+    "prisma": "^6.19.3"
   }
 }
