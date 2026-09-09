@@ -59,8 +59,9 @@ router.post('/', handleUpload, (req, res) => {
       return res.status(400).json({ error: 'No se subió ninguna imagen' });
     }
     
-    // Construct the public URL
-    const imageUrl = `/uploads/${req.file.filename}`;
+    // Construct the public URL using the API domain
+    const baseUrl = process.env.API_URL || process.env.VITE_API_URL || 'https://rotiapp.onrender.com';
+    const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
     
     res.status(200).json({ url: imageUrl });
   } catch (error) {
