@@ -22,6 +22,6 @@ app.use('/api/insumos', require('./routes/insumos.routes'));
 app.use('/api/productos', require('./routes/productos.routes'));
 app.use('/api/ventas', require('./routes/ventas.routes'));
 app.use('/api/upload', require('./routes/upload.routes'));
-app.use('/uploads', express.static(require('path').join(__dirname, '../uploads')));
+
 
 module.exports = app;
